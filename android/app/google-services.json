@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1038776736651",
+    "project_id": "bondbridge-5bb5b",
+    "storage_bucket": "bondbridge-5bb5b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1038776736651:android:2a9dfcb7bc5f01addaed8e",
+        "android_client_info": {
+          "package_name": "com.bondbridge.bondbridgeonline"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdE4XpP7sChIrUZ7mXqXLDjRufBfMEa5k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
