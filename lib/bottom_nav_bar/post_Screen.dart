@@ -1,1151 +1,1774 @@
-import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
-import 'dart:io';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:file_picker/file_picker.dart';
+import 'dart:developer' as dev;
+import 'dart:developer' show log;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:media_kit/media_kit.dart';
-import 'package:media_kit_video/media_kit_video.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:socialmedia/api_service/user_provider.dart';
+import 'package:socialmedia/bottom_nav_bar/activity/acitivity_screen.dart';
+import 'package:socialmedia/bottom_nav_bar/activity/chatProvider.dart';
+import 'package:socialmedia/bottom_nav_bar/activity/group/see_participants.dart';
+import 'package:socialmedia/bottom_nav_bar/activity/group/shimmerchatscreen.dart';
+import 'package:socialmedia/bottom_nav_bar/activity/group_call.dart';
+import 'package:socialmedia/bottom_nav_bar/activity/group_call_bottom_sheet.dart';
 import 'package:socialmedia/bottom_nav_bar/bottom_nav.dart';
-import 'package:socialmedia/bottom_nav_bar/explore-pages/postProvider.dart';
-import 'package:socialmedia/bottom_nav_bar/custom_dropdown.dart';
-import 'package:socialmedia/main.dart';
-import 'package:socialmedia/services/user_Service_provider.dart';
-import 'package:socialmedia/user_apis/post_api.dart';
-import 'package:socialmedia/utils/colors.dart';
+import 'package:socialmedia/services/agora_Call_Service.dart';
+import 'package:socialmedia/services/agora_video_Call.dart';
+import 'package:socialmedia/services/chat_socket_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:socialmedia/services/message.dart';
+import 'package:socialmedia/users/searched_userprofile.dart';
+import 'package:socialmedia/utils/colors.dart';
 import 'package:socialmedia/utils/constants.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
-import 'package:video_player/video_player.dart';
+import 'package:socialmedia/utils/reaction_constants.dart'
+    show ReactionConstants;
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socialmedia/bottom_nav_bar/activity/group/editgroupscreen.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
+import 'dart:async';
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import 'package:path/path.dart' as path;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:flutter/rendering.dart';
 
-class PostScreen extends StatefulWidget {
-  final String? communityId;
+class DChatScreen extends StatefulWidget {
+  ChatRoom chatRoom;
 
-  const PostScreen({super.key, this.communityId});
+  DChatScreen({required this.chatRoom});
+
   @override
-  _PostScreenState createState() => _PostScreenState();
+  DChatScreenState createState() => DChatScreenState();
 }
 
-class _PostScreenState extends State<PostScreen> with WidgetsBindingObserver {
-  final FocusNode _focusNode = FocusNode();
+class DChatScreenState extends State<DChatScreen> {
   final TextEditingController _controller = TextEditingController();
-  late stt.SpeechToText _speech;
-  bool _isListening = false;
-  String _text = "";
-
-  final ImagePicker _picker = ImagePicker();
-  XFile? _selectedImage; // To store the selected image
+  static const _pageSize = 20;
+  final PagingController<int, Message> _pagingController =
+      PagingController(firstPageKey: 1);
   String? userid;
-  String? token;
-  String? username;
-  List<XFile> _selectedImages = [];
+  late IO.Socket _socket;
+  final SocketService _socketService = SocketService();
+  Map<String, Participant> participantsMap = {};
+  bool isnewconversation = true;
   late UserProviderall userProvider;
-  bool _isLoadingbond = false; // Loading state
-  int _characterCount = 0;
-  bool _isLoading = false; // To manage the loading state
-  double _keyboardHeight = 0.0;
-  bool _isAnonymous = false;
+  late Future<List<String>> _randomTextFuture;
+  bool isNewConversation = true;
+  bool _isMessagesLoaded = false;
+  Message? _replyingToMessage;
+  final GlobalKey<AnimatedListState> _replyPreviewKey = GlobalKey();
+  String _receiverid = '';
+  String lastSeen = '';
+  final Map<String, Message> _allMessagesById = {};
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    _focusNode.addListener(_onFocusChange);
+    print(
+        '🚀 Initializing DChatScreen for chatRoomId: ${widget.chatRoom.chatRoomId}');
+    print('📱 Room type: ${widget.chatRoom.roomType}');
+    print(
+        '👥 Initial participants count: ${widget.chatRoom.participants.length}');
+
+    // Initialize userProvider first
     userProvider = Provider.of<UserProviderall>(context, listen: false);
 
-    // Debug print to check if profilePic is available
-    print("Current profilePic value: ${userProvider.profilePic}");
-
-    // Ensure user data is loaded
-    userProvider.loadUserData().then((_) {
-      print("After loading, profilePic value: ${userProvider.profilePic}");
-      setState(() {}); // Refresh UI after loading data
-    });
-
-    FilePicker.platform;
-    getuseridandtoken();
-
-    _speech = stt.SpeechToText();
-  }
-
-  Future<void> _startListening() async {
-    bool available = await _speech.initialize(
-      onStatus: (status) {
-        print("🎤 Speech Status: $status");
-      },
-      onError: (errorNotification) {
-        print("Speech Error: $errorNotification");
-      },
-    );
-
-    if (available) {
-      setState(() => _isListening = true);
-
-      _speech.listen(
-        onResult: (result) {
-          if (!_isListening) return;
-
-          setState(() {
-            _controller.text = result.recognizedWords;
-            _characterCount = _controller.text.length;
-          });
-
-          // Send message only when speech recognition is complete
-          if (result.finalResult) {
-            setState(() => _isListening = false);
-          }
-        },
-      );
+    // Refresh group details first if it's a group chat
+    if (widget.chatRoom.roomType == 'group') {
+      print('🔄 Starting group details refresh...');
+      refreshGroupDetails().then((_) {
+        print('✅ Group details refresh completed');
+        // Initialize other data after refreshing group details
+        _initializeBasicData();
+      });
     } else {
-      print("Speech Recognition is not available.");
+      // If not a group chat, just initialize basic data
+      _initializeBasicData();
     }
   }
 
-  void _stopListening() {
-    _speech.stop();
-    setState(() => _isListening = false);
-  }
-
-  bool isVideo(XFile file) {
-    final path = file.path.toLowerCase();
-    return path.endsWith('.mp4') || path.endsWith('.mov') || path.endsWith('.avi');
-  }
-
-  void _onFocusChange() {
-    if (_focusNode.hasFocus) {
-      // Keyboard is open
-    } else {
-      // Keyboard is closed
-    }
-    setState(() {});
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _focusNode.removeListener(_onFocusChange);
-    _focusNode.dispose();
-    _controller.dispose();
-    super.dispose();
-    _speech.stop();
-  }
-
-  @override
-  void didChangeMetrics() {
-    super.didChangeMetrics();
-    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
-    setState(() {
-      _keyboardHeight = bottomInset;
-    });
-  }
-
-  void _selectAndRewriteText() async {
-    if (_controller.text.isEmpty) return;
-
-    // Select all text
-    _controller.selection = TextSelection(
-      baseOffset: 0,
-      extentOffset: _controller.text.length,
-    );
-
-    setState(() => _isLoading = true); // Show loading
-
+  Future<void> _initializeBasicData() async {
     try {
-      // Make API Call
-      final response = await http.post(
-        Uri.parse("${BASE_URL}api/reWriteWithBond"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"caption": _controller.text}),
-      );
+      // Load user data first
+      await userProvider.loadUserData();
+      log(userProvider.userId!);
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        setState(() {
-          _controller.text = data["rewritten"]; // Update controller text
-        });
-      } else {
-        print("Failed to fetch rewritten text");
-      }
-    } catch (e) {
-      print("Error: $e");
-    } finally {
-      setState(() => _isLoading = false); // Hide loading
-    }
-  }
+      // Get user ID from SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      userid = prefs.getString('user_id');
 
-  void _toggleAnonymous() {
-    setState(() {
-      _isAnonymous = !_isAnonymous;
-    });
-  }
-
-  Future<void> _postToCommunity() async {
-    setState(() => _isLoading = true);
-
-    await submitCommunityPost(
-      context: context,
-      mediaFiles: _selectedImages.map((xfile) => File(xfile.path)).toList(),
-      userid: userid!,
-      token: token!,
-      content: _controller.text,
-      communityId: widget.communityId!,
-      isAnonymous: _isAnonymous,
-    );
-  }
-
-  void _post() async {
-    setState(() => _isLoading = true);
-
-    try {
-      if (widget.communityId == null) {
-        log("Post to Explore page");
-        await submitPost(
-          context: context,
-          mediaFiles: _selectedImages.map((xfile) => File(xfile.path)).toList(),
-          userid: userid!,
-          token: token!,
-          content: _controller.text,
-        );
-      } else {
-        log("Post to Community page");
-        await _postToCommunity();
+      if (userid == null) {
+        print('Error: User ID is null');
         return;
       }
 
-      if (widget.communityId == null) {
-        Navigator.pop(context);
-      } else {
-        // Refresh the posts in Explore page
-        final postsProvider = Provider.of<PostsProvider>(context, listen: false);
-        await postsProvider.fetchPosts(userid!, token!, forceRefresh: true);
+      // Initialize socket connection
+      await _ensureSocketConnection();
 
-        // Navigate back to Explore page
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const BottomNavBarScreen()),
-        );
+      // Initialize chat after socket connection
+      await _initializeChat();
+
+      // Initialize participants map only after we have userid
+      if (mounted) {
+        initParticipantsMap(widget.chatRoom.participants);
       }
-    } finally {
-      setState(() => _isLoading = false);
+
+      // Initialize paging controller
+      _pagingController.addPageRequestListener((pageKey) {
+        _fetchPage(pageKey);
+      });
+
+      if (mounted) {
+        setState(() {
+          _randomTextFuture = fetchRandomText();
+        });
+      }
+
+      // Fetch first page
+      await _fetchPage(1);
+    } catch (e) {
+      print('Initialization error: $e');
+      // Handle error appropriately
     }
   }
 
-  Future<void> _pickMedia() async {
+  void initParticipantsMap(List<Participant> participants) {
+    if (userid == null) {
+      print('Error: Cannot initialize participants map without user ID');
+      return;
+    }
+
+    participantsMap.clear();
+    for (var participant in participants) {
+      if (participant.userId != userid) {
+        participantsMap[participant.userId] = participant;
+      }
+    }
+  }
+
+  Future<void> _ensureSocketConnection() async {
     try {
-      // Show bottom sheet with options
-      await showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          return Container(
-            height: 300.h,
-            color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
-            child: Column(
-              children: [
-                // First ListTile styled like OutlinedButton
-                Padding(
-                  padding: EdgeInsets.all(16.0.h),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Color(0xFF7400A5),
-                        width: 1.2,
-                      ),
-                      borderRadius: BorderRadius.circular(15.sp),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    child: ListTile(
-                      leading: Icon(
-                        Icons.photo,
-                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
-                      ),
-                      title: Text(
-                        'Photos',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
-                        ),
-                      ),
-                      onTap: () async {
-                        Navigator.pop(context);
-                        final List<XFile> pickedImages = await _picker.pickMultiImage();
-                        if (pickedImages.isNotEmpty) {
-                          setState(() {
-                            _selectedImages.addAll(pickedImages);
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                ),
-                SizedBox(height: 5.h), // Add spacing between tiles
-
-                // Second ListTile styled like OutlinedButton
-                Padding(
-                  padding: EdgeInsets.all(16.0.h),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Color(0xFF7400A5),
-                        width: 1.2,
-                      ),
-                      borderRadius: BorderRadius.circular(15.sp),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    child: ListTile(
-                      leading: Icon(
-                        Icons.video_library,
-                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
-                      ),
-                      title: Text(
-                        'Videos',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
-                        ),
-                      ),
-                      onTap: () async {
-                        Navigator.pop(context);
-                        final XFile? videoFile = await ImagePicker().pickVideo(
-                          source: ImageSource.gallery,
-                        );
-
-                        if (videoFile != null) {
-                          final controller = VideoPlayerController.file(File(videoFile.path));
-                          await controller.initialize();
-                          final duration = controller.value.duration.inSeconds;
-                          await controller.dispose();
-
-                          if (duration <= 60) {
-                            setState(() {
-                              _selectedImages.add(videoFile);
-                            });
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Videos longer than 1 minute are not allowed.")),
-                            );
-                          }
-                        }
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    } catch (e, stack) {
-      debugPrint('❌ Error picking media: $e');
-      debugPrint('🪵 Stack trace: $stack');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to pick media: $e")),
-      );
+      if (!_socketService.isConnected) {
+        await _socketService.connect();
+      }
+    } catch (e) {
+      print('Socket connection error: $e');
     }
   }
 
-  void _removeImage(int index) {
-    setState(() {
-      _selectedImages.removeAt(index);
+  Future<void> _initializeChat() async {
+    try {
+      await _socketService.connect();
+      print('✅ Socket connected: ${_socketService.isConnected}');
+
+      // Remove any existing receiveMessage listener to avoid duplicates
+      // _socketService.socket.off('receiveMessage');
+
+      // Set up the receiveMessage listener with enhanced debugging
+      _socketService.socket.on('receiveMessage', (data) {
+        print('✅✅✅ Received message via socket: $data');
+        try {
+          Map<String, dynamic> messageMap;
+          if (data is String) {
+            messageMap = jsonDecode(data) as Map<String, dynamic>;
+          } else if (data is Map) {
+            messageMap = Map<String, dynamic>.from(data);
+          } else {
+            throw Exception('Unexpected data type: ${data.runtimeType}');
+          }
+
+          print('Parsed message keys: ${messageMap.keys.toList()}');
+          final newMessage = Message.fromJson(messageMap);
+          final userProvider =
+              Provider.of<UserProviderall>(context, listen: false);
+          final currentUserId = userProvider.userId;
+          // Only insert into the UI if the message is not from the current user.
+          if (newMessage.senderId != currentUserId) {
+            if (_pagingController.itemList == null) {
+              _pagingController.itemList = [];
+            }
+            _pagingController.itemList!.insert(0, newMessage);
+            _pagingController.notifyListeners();
+            print('✅ New message added to list: $newMessage');
+          } else {
+            print('Message not added since it is from the current user.');
+          }
+        } catch (e) {
+          print('🚨 Error processing socket message: $e');
+        }
+      });
+
+      // Debug log to confirm room joining
+      print('✅ Joining room: ${widget.chatRoom.chatRoomId}');
+      _socketService.joinRoom(widget.chatRoom.chatRoomId);
+    } catch (e, stackTrace) {
+      print('❌ Chat initialization error: $e');
+      print('📜 Stack trace: $stackTrace');
+    }
+  }
+
+  Future<List<String>> fetchRandomText() async {
+    //print(widget.chatRoom.participants.first.)
+    final userProvider = Provider.of<UserProviderall>(context, listen: false);
+    String url =
+        '${BASE_URL}api/getRandomText?other=${widget.chatRoom.participants.first.userId}';
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'userid': userProvider.userId!,
+        'token': userProvider.userToken!,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final String topicText = data['topic'] ?? '';
+
+      // Splitting the text into individual messages
+      List<String> messages = topicText.split('\n').map((msg) {
+        // Remove leading numbers (e.g., "1. ") and quotation marks
+        return msg
+            .replaceAll(RegExp(r'^\d+\.\s*'), '')
+            .replaceAll('"', '')
+            .trim();
+      }).toList();
+
+      return messages;
+    } else {
+      throw Exception('Failed to fetch data');
+    }
+  }
+
+  Future<void> markMessageAsSeen(String id) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('user_id');
+      final token = prefs.getString('user_token');
+
+      if (userId == null || token == null) {
+        return;
+      }
+
+      final response = await http.post(
+        Uri.parse('${BASE_URL}api/messages/interact'),
+        headers: {
+          'userid': userId,
+          'token': token,
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({"entityId": id, "reactionType": "seen"}),
+      );
+
+      if (response.statusCode == 200) {
+        print('Message marked as seen');
+      } else {
+        print('Failed to mark message as seen: ${response.body}');
+      }
+    } catch (error) {
+      print('Error marking message as seen: $error');
+    }
+  }
+
+  Future<void> initSocket() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? userId =
+        prefs.getString('user_id'); // Fetch user ID from SharedPreferences
+    print('yelelelelelelellee $userId');
+
+    if (userId == null) {
+      debugPrint("User ID not found in SharedPreferences");
+      return; // Exit if userId is null
+    }
+
+    _socket = IO.io(BASE_URL, <String, dynamic>{
+      "transports": ["websocket"],
+      "autoConnect": false,
+    });
+
+    _socket.connect();
+    print('hogyaaaa');
+    _socket.emit('openCall', userId);
+
+    _socket.onConnect((_) {
+      debugPrint("Connected to socket server");
     });
   }
 
-  Future<void> getuseridandtoken() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
+  Future<void> fetchUsername() async {
+    final prefs = await SharedPreferences.getInstance();
     setState(() {
       userid = prefs.getString('user_id');
-      token = prefs.getString('user_token');
-    }); // Retrieve the 'username' key
+    });
   }
 
-  Future<File?> _compressImage(File file) async {
+  Future<void> _fetchPage(int pageKey) async {
+    log('Fetching page $pageKey with pageSize $_pageSize', name: 'Messages');
     try {
-      // Get the image size
-      final fileSize = await file.length();
-      // If file is already small enough (e.g., less than 1MB), return as is
-      if (fileSize < 1024 * 1024) {
-        return file;
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('user_id');
+      final token = prefs.getString('user_token');
+
+      if (userId == null || token == null) {
+        log('Error: User credentials not found', name: 'Messages');
+        return;
       }
 
-      // Compress the image
-      final result = await FlutterImageCompress.compressAndGetFile(
-        file.path,
-        file.path + '_compressed.jpg',
-        quality: 70, // Adjust quality as needed
-        minWidth: 1080, // Adjust width as needed
-        minHeight: 1080, // Adjust height as needed
+      final response = await http.post(
+        Uri.parse('${BASE_URL}api/get-all-messages'),
+        headers: {
+          'userid': userId,
+          'token': token,
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          "roomId": widget.chatRoom.chatRoomId,
+          "page": pageKey.toString(),
+          "limit": _pageSize.toString(),
+        }),
       );
 
-      return result != null ? File(result.path) : null;
+      if (response.statusCode == 200) {
+        // Log raw response body
+        log('📦 Messages Response:', name: 'Messages');
+        log(response.body, name: 'Messages');
+
+        final data = json.decode(response.body);
+
+        // Extract and set agoTime for DM chats from the first message
+        if (widget.chatRoom.roomType == 'dm' &&
+            data['messages'] is List &&
+            data['messages'].isNotEmpty) {
+          final firstMessage = data['messages'][0];
+          final String agoTimeValue = firstMessage['agoTime'] ?? '';
+
+          if (mounted && agoTimeValue.isNotEmpty) {
+            setState(() {
+              lastSeen = 'last seen $agoTimeValue';
+            });
+          }
+        }
+
+        // Create messages from response
+        final List<Message> fetchedMessages = (data['messages'] as List)
+            .map((msg) => Message.fromJson(msg))
+            .toList();
+
+        log('Fetched ${fetchedMessages.length} messages', name: 'Messages');
+
+        // Update reply relationships for all fetched messages
+        _updateReplyRelationships(fetchedMessages);
+
+        // Fetch reactions for each message
+        log('Fetching reactions for all messages', name: 'MessagesReactions');
+
+        List<Message> updatedMessages = [];
+        for (var message in fetchedMessages) {
+          log('Fetching reactions for message: ${message.id}',
+              name: 'MessagesReactions');
+
+          // Fetch reactions for the message
+          final reactions = await fetchMessageReactions(message.id);
+
+          log('Retrieved ${reactions.length} reactions for message: ${message.id}',
+              name: 'MessagesReactions');
+
+          // Create updated message with fetched reactions
+          final updatedMessage = message.copyWith(reactions: reactions);
+          updatedMessages.add(updatedMessage);
+        }
+
+        // Log message data for DM chats
+        if (widget.chatRoom.roomType == 'dm') {
+          log('📱 Loading DM chat messages:', name: 'Messages');
+        }
+
+        if (updatedMessages.isNotEmpty) {
+          isnewconversation = false;
+          isNewConversation = false;
+          markMessageAsSeen(data['messages'][0]['_id']);
+          log('Marked message as seen: ${data['messages'][0]['_id']}',
+              name: 'Messages');
+        }
+
+        setState(() {
+          isnewconversation;
+        });
+
+        if (pageKey == 1) {
+          setState(() {
+            _isMessagesLoaded = true;
+          });
+          log('First page loaded, _isMessagesLoaded set to true',
+              name: 'Messages');
+        }
+
+        final isLastPage = updatedMessages.length < _pageSize;
+        if (isLastPage) {
+          log('Appending last page, messages count: ${updatedMessages.length}',
+              name: 'Messages');
+          _pagingController.appendLastPage(updatedMessages);
+        } else {
+          log('Appending page $pageKey, messages count: ${updatedMessages.length}',
+              name: 'Messages');
+          _pagingController.appendPage(updatedMessages, pageKey + 1);
+        }
+      } else {
+        log('Failed to load messages: ${response.statusCode}',
+            name: 'Messages');
+        _pagingController.error = 'Failed to load messages';
+      }
+    } catch (error) {
+      log('Error in _fetchPage: $error', name: 'Messages');
+      _pagingController.error = error;
+    }
+  }
+
+  Future<void> _sendMessage() async {
+    final message = _controller.text;
+    if (message.isEmpty || userid == null) return;
+
+    try {
+      // Create a temporary message object with current time
+      final newMessage = Message(
+        id: DateTime.now().toString(), // Temporary ID
+        content: message,
+        senderId: userid!,
+        timestamp: DateTime.now(),
+        time: DateFormat('HH:mm').format(DateTime.now()), // Add current time
+      );
+
+      // Add message to the list immediately
+      setState(() {
+        if (_pagingController.itemList == null) {
+          _pagingController.itemList = [];
+        }
+        _pagingController.itemList!.insert(0, newMessage);
+      });
+
+      // Clear the input field
+      _controller.clear();
+
+      // Send the message through socket with time parameter
+      _socketService.sendMessage(
+        userid!,
+        widget.chatRoom.chatRoomId,
+        message,
+        DateFormat('HH:mm').format(DateTime.now()), // Add time parameter
+        false,
+        false,
+      );
+
+      setState(() {
+        isNewConversation = false;
+      });
     } catch (e) {
-      print('Error compressing image: $e');
-      return file;
+      print('Error sending message: $e');
+      // Optionally remove the message if sending failed
+      if (_pagingController.itemList != null) {
+        setState(() {
+          _pagingController.itemList!.removeAt(0);
+        });
+      }
+    }
+  }
+
+  Future<void> _joinCall(String callId, String type, bool fromgroup) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('callToken');
+    final channelName = prefs.getString('channelName');
+    bool isvideo = type == 'video' ? true : false;
+
+    if (token == null || channelName == null) return;
+
+    _socketService.joinCall(callId, userid!);
+
+    if (fromgroup) {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => VideoCallScreen(
+                    roomId: widget.chatRoom.chatRoomId,
+                    participantsMap: participantsMap,
+                    currentUserId: userid!,
+                    isVideoCall: isvideo,
+                    token: token,
+                    channel: channelName,
+                    callID: callId,
+                  )));
+      return;
+    }
+
+    if (type == 'audio') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AgoraCallService(
+            channel: channelName,
+            token: token,
+            callID: callId,
+            profile: widget.chatRoom.participants.first.profilePic == null
+                ? 'assets/avatar/3.png'
+                : widget.chatRoom.participants.first.profilePic!,
+            name: widget.chatRoom.participants.first.name!,
+          ),
+        ),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AgoraVidCall(
+              channel: channelName,
+              token: token,
+              callerName: 'Video Call',
+              call_id: callId,
+              profile: widget.chatRoom.participants.first.profilePic == null
+                  ? 'assets/avatar/3.png'
+                  : widget.chatRoom.participants.first.profilePic!,
+              name: widget.chatRoom.participants.first.name!),
+        ),
+      );
+    }
+  }
+
+  Future<void> startCall(String toUserId, String type, bool fromgrp) async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('user_id');
+    final token = prefs.getString('user_token');
+
+    if (userId == null || token == null) return;
+
+    final response = await http.post(
+      Uri.parse('${BASE_URL}api/start-call'),
+      headers: {
+        'userid': userId,
+        'token': token,
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        "to": widget.chatRoom.chatRoomId,
+        "type": type,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      await prefs.setString('channelName', data['call']['channelName']);
+      await prefs.setString('callToken', data['token']);
+      print('Call started: ${data['message']}');
+
+      _socketService.initiateCall(
+          data['call']['_id'], userId, [toUserId], type);
+      _joinCall(data['call']['_id'], type, fromgrp);
+
+      // if (type == 'audio') {
+      //   Navigator.pushReplacement(
+      //       context,
+      //       MaterialPageRoute(
+      //           builder: (context) => AgoraCallService(
+      //                 channel: data['call']['channelName'],
+      //                 token: data['token'],
+      //                 callID: data['call']['_id'],
+      //               )));
+      // } else {
+      //   Navigator.pushReplacement(
+      //       context,
+      //       MaterialPageRoute(
+      //           builder: (context) => AgoraVidCall(
+      //                 channel: data['call']['channelName'],
+      //                 token: data['token'],
+      //                 callerName: 'video call',
+      //                 call_id: data['call']['_id'],
+      //               )));
+      // }
+    } else {
+      print('Failed to start call');
+    }
+  }
+
+  void showAddFriendsSheet(BuildContext context,
+      Map<String, Participant> participantsMap, String type) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => SafeArea(
+        child: AddFriendsBottomSheet(
+          participantsMap: participantsMap,
+          onInvite: (userId) async {
+            await startCall(widget.chatRoom.chatRoomId, type, true);
+            // Handle invite logic here
+
+            print('Inviting user: $userId');
+            // You might want to add API call to invite user
+          },
+        ),
+      ),
+    );
+  }
+
+  void _copyAndPasteText(String text) {
+    Clipboard.setData(ClipboardData(text: text));
+    _controller.text = text; // Automatically set text in the input field
+  }
+
+  String truncateName(String name, {int maxLength = 10}) {
+    return name.length > maxLength
+        ? '${name.substring(0, maxLength)}...'
+        : name;
+  }
+
+  Future<void> refreshGroupDetails() async {
+    try {
+      final userProvider = Provider.of<UserProviderall>(context, listen: false);
+
+      final response = await http.get(
+        Uri.parse(
+            '${BASE_URL}api/get-chatroom-details?chatRoomId=${widget.chatRoom.chatRoomId}'),
+        headers: {
+          'UserId': userProvider.userId!,
+          'token': userProvider.userToken!,
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        final chatRoomData = data['chatRoom'];
+        // print(
+        //     '👥 Group participants count: ${(chatRoomData['participants'] as List).length}');
+        // print('🏷️ Group name: ${chatRoomData['groupName']}');
+        // print('👑 Admin ID: ${chatRoomData['admin']}');
+        // print('📅 Created at: ${chatRoomData['createdAt']}');
+        // print('🔄 Last updated: ${chatRoomData['updatedAt']}');
+        // print('👀 Unseen count: ${chatRoomData['unseenCount']}');
+
+        setState(() {
+          widget.chatRoom = ChatRoom(
+              id: chatRoomData['_id'],
+              chatRoomId: chatRoomData['chatRoomId'],
+              participants: (chatRoomData['participants'] as List)
+                  .map((p) => Participant.fromJson(p))
+                  .toList(),
+              roomType: chatRoomData['roomType'],
+              groupName: chatRoomData['groupName'],
+              profileUrl: chatRoomData['profileUrl'],
+              admin: chatRoomData['admin'],
+              lastmessage: chatRoomData['lastMessage'] != null
+                  ? Lastmessage.fromJson(chatRoomData['lastMessage'])
+                  : null,
+              createdAt: DateTime.parse(chatRoomData['createdAt']),
+              updatedAt: DateTime.parse(chatRoomData['updatedAt']),
+              isPart: chatRoomData['isPart'],
+              lastseencount: chatRoomData['unseenCount'],
+              groupProfile: chatRoomData['profileUrl']);
+        });
+      } else {
+        print(
+            '❌ Failed to refresh group details. Status code: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('❌ Error refreshing group details: $error');
+    }
+  }
+
+  // Add this method to force refresh the screen
+  void forceRefresh() async {
+    if (mounted) {
+      await refreshGroupDetails();
+      setState(() {}); // Force rebuild the UI with new data
+    }
+  }
+
+  void _setReplyingToMessage(Message message) {
+    setState(() {
+      _replyingToMessage = message;
+    });
+  }
+
+  void _showReplyOptions(BuildContext context, Message message) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom +
+              100, // Add extra padding
+        ),
+        decoration: BoxDecoration(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey[900]
+              : Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.reply, color: Color(0xFF7400A5)),
+              title: Text('Reply'),
+              onTap: () {
+                _setReplyingToMessage(message);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _sendReplyMessage() async {
+    if (_controller.text.isEmpty || _replyingToMessage == null) return;
+
+    try {
+      // Create the message with reply information and current time
+      final replyMessage = Message(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          content: _controller.text,
+          senderId: userid!,
+          timestamp: DateTime.now(),
+          replyToMessageId: _replyingToMessage!.id,
+          replyToMessage: _replyingToMessage,
+          time: DateFormat('HH:mm').format(DateTime.now())); // Add current time
+
+      // Send via socket with time parameter
+      _socketService.sendReplyMessage(
+        senderId: userid!,
+        roomId: widget.chatRoom.chatRoomId,
+        content: _controller.text,
+        replyToMessageId: _replyingToMessage!.id,
+        time: DateFormat('HH:mm').format(DateTime.now()), // Add time parameter
+      );
+
+      // Add to UI immediately
+      if (mounted) {
+        setState(() {
+          _pagingController.itemList?.insert(0, replyMessage);
+          _replyingToMessage = null;
+        });
+      }
+
+      _controller.clear();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to send reply: ${e.toString()}')),
+        );
+      }
+    }
+  }
+
+  Message? _findMessageById(String messageId) {
+    // First check in our global message map
+    if (_allMessagesById.containsKey(messageId)) {
+      print('📍 Found replied message in global map: $messageId');
+      return _allMessagesById[messageId];
+    }
+
+    // Then check in the current page controller items
+    if (_pagingController.itemList != null) {
+      final message = _pagingController.itemList!.firstWhere(
+        (msg) => msg.id == messageId,
+        orElse: () => Message(
+          id: messageId,
+          content: "Original message not found",
+          senderId: "",
+          timestamp: DateTime.now(),
+        ),
+      );
+      print('🔍 Found replied message in current page: ${message.id}');
+      return message;
+    }
+
+    print('❌ Could not find replied message: $messageId');
+    return null;
+  }
+
+  void _updateReplyRelationships(List<Message> messages) {
+    for (var message in messages) {
+      // Add to global message map
+      _allMessagesById[message.id] = message;
+
+      // Try to link reply relationships
+      if (message.replyToMessageId != null) {
+        final replyToMessage = _findMessageById(message.replyToMessageId!);
+        if (replyToMessage != null) {
+          print('🔗 Linking reply relationship:');
+          print('   Message: ${message.id}');
+          print('   Replying to: ${replyToMessage.id}');
+          print('   Reply content: ${replyToMessage.content}');
+          _allMessagesById[message.id] =
+              message.copyWith(replyToMessage: replyToMessage);
+        }
+      }
+    }
+  }
+
+// Currently sending Base64 String of Raw Image Data , Need to Change it to upload uri
+  Future<void> _pickAndSendMedia() async {
+    try {
+      print('📁 Starting image picker...');
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        allowMultiple: false,
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        final file = result.files.first;
+        final filePath = file.path;
+        final fileName = file.name;
+
+        print('📄 Selected image details:');
+        print('   Path: $filePath');
+        print('   Name: $fileName');
+
+        if (filePath == null) {
+          print('❌ Error: File path is null');
+          return;
+        }
+
+        // Create a temporary message object with local file path for preview
+        final newMessage = Message(
+          id: DateTime.now().toString(),
+          content: '',
+          senderId: userid!,
+          timestamp: DateTime.now(),
+          time: DateFormat('HH:mm').format(DateTime.now()),
+          media: filePath, // Use local path for immediate preview
+          mediaType: MediaType.image,
+          mediaName: fileName,
+        );
+
+        print('💬 Created temporary message with local file path');
+
+        // Add message to the list immediately for preview
+        setState(() {
+          if (_pagingController.itemList == null) {
+            _pagingController.itemList = [];
+          }
+          _pagingController.itemList!.insert(0, newMessage);
+        });
+
+        try {
+          print('🔌 Sending file through socket...');
+
+          // Read and compress the image
+          final bytes = await File(filePath).readAsBytes();
+          final compressedBytes = await FlutterImageCompress.compressWithList(
+            bytes,
+            minHeight: 1024, // Max height
+            minWidth: 1024, // Max width
+            quality: 70, // Compression quality
+          );
+
+          final base64File = base64Encode(compressedBytes);
+
+          print('📤 Sending message with compressed image...');
+          _socketService.sendMessage(
+            userid!,
+            widget.chatRoom.chatRoomId,
+            '', // Empty content for media messages
+            'message',
+            false,
+            false,
+            media: base64File,
+            mediaType: 'image',
+            mediaName: fileName,
+          );
+
+          print('✅ Message sent through socket');
+
+          // Listen for message receipt confirmation
+          _socketService.socket.once('messageConfirmation', (data) {
+            print('📥 Received message confirmation:');
+            print(json.encode(data));
+
+            if (data != null && data['media'] != null) {
+              print('🔗 Server media URL: ${data['media']}');
+
+              // Update the message with the server URL
+              setState(() {
+                final updatedMessage = newMessage.copyWith(
+                  media: data['media'],
+                  id: data['_id'] ?? data['id'] ?? newMessage.id,
+                );
+                final index = _pagingController.itemList!
+                    .indexWhere((msg) => msg.id == newMessage.id);
+                if (index != -1) {
+                  _pagingController.itemList![index] = updatedMessage;
+                }
+              });
+            }
+          });
+        } catch (e, stackTrace) {
+          print('❌ Error during socket send: $e');
+          print('📜 Stack trace: $stackTrace');
+
+          // Remove the message if sending fails
+          setState(() {
+            _pagingController.itemList!.removeAt(0);
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error sending image: $e')),
+          );
+        }
+
+        setState(() {
+          isNewConversation = false;
+        });
+      }
+    } catch (e) {
+      print('❌ Error picking image: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking image: $e')),
+      );
+    }
+  }
+
+  Future<void> addMessageReaction(String messageId, String reactionType) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('user_id');
+      final token = prefs.getString('user_token');
+
+      if (userId == null || token == null) {
+        return;
+      }
+
+      final response = await http.post(
+        Uri.parse('${BASE_URL}api/reaction'),
+        headers: {
+          'userid': userId,
+          'token': token,
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          "entityId": messageId,
+          "reactionType": reactionType,
+          "entityType": "message"
+        }),
+      );
+
+      print('Reaction API Response: ${response.body}');
+    } catch (e) {
+      print('Error adding reaction: $e');
+    }
+  }
+
+  Future<List<Reaction>> fetchMessageReactions(String messageId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('user_id');
+      final token = prefs.getString('user_token');
+
+      if (userId == null || token == null) {
+        print('Error: User credentials not found');
+        return [];
+      }
+
+      final response = await http.post(
+        Uri.parse('${BASE_URL}api/get-all-reactions'),
+        headers: {
+          'userid': userId,
+          'token': token,
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({"entityId": messageId, "entityType": "message"}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print('Reactions API Response: ${response.body}');
+
+        if (data['reactions'] != null) {
+          return (data['reactions'] as List)
+              .map((reaction) => Reaction.fromJson(reaction))
+              .toList();
+        }
+      } else {
+        print('Failed to fetch reactions: ${response.body}');
+      }
+    } catch (e) {
+      print('Error fetching reactions: $e');
+    }
+    return [];
+  }
+
+  void _updateMessageReaction(String messageId, String reactionType) async {
+    try {
+      // First add the reaction
+      await addMessageReaction(messageId, reactionType);
+
+      // Update the message in the UI immediately
+      setState(() {
+        final messageIndex = _pagingController.itemList
+            ?.indexWhere((msg) => msg.id == messageId);
+
+        if (messageIndex != null && messageIndex != -1) {
+          final currentMessage = _pagingController.itemList![messageIndex];
+          final currentReactions = currentMessage.reactions ?? [];
+
+          // Check if user already reacted
+          final existingReactionIndex = currentReactions
+              .indexWhere((r) => r.users.any((u) => u.userId == userid));
+
+          List<Reaction> updatedReactions;
+          if (existingReactionIndex != -1) {
+            // User already reacted, update the existing reaction
+            final existingReaction = currentReactions[existingReactionIndex];
+            if (existingReaction.type == reactionType) {
+              // Remove reaction if same type is selected again
+              updatedReactions = List.from(currentReactions)
+                ..removeAt(existingReactionIndex);
+            } else {
+              // Update reaction type
+              updatedReactions = List.from(currentReactions)
+                ..[existingReactionIndex] = existingReaction.copyWith(
+                  type: reactionType,
+                );
+            }
+          } else {
+            // Add new reaction
+            updatedReactions = List.from(currentReactions)
+              ..add(Reaction(
+                type: reactionType,
+                count: 1,
+                users: [ReactionUser(userId: userid!)],
+              ));
+          }
+
+          final updatedMessage = currentMessage.copyWith(
+            reactions: updatedReactions,
+            currentUserReaction: reactionType,
+          );
+          _pagingController.itemList![messageIndex] = updatedMessage;
+        }
+      });
+
+      // Then fetch updated reactions from server
+      final updatedReactions = await fetchMessageReactions(messageId);
+
+      // Update the message with server data
+      setState(() {
+        final messageIndex = _pagingController.itemList
+            ?.indexWhere((msg) => msg.id == messageId);
+
+        if (messageIndex != null && messageIndex != -1) {
+          final updatedMessage =
+              _pagingController.itemList![messageIndex].copyWith(
+            reactions: updatedReactions,
+          );
+          _pagingController.itemList![messageIndex] = updatedMessage;
+        }
+      });
+    } catch (e) {
+      print('Error updating message reaction: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      // onWillPop: () async {
-      //   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BottomNavBarScreen()));
-      //   return false;
-      // },
-      onWillPop: () async {
-        // Check if there's unsaved content
-        if (_controller.text.isNotEmpty || _selectedImages.isNotEmpty) {
-          // Show confirmation dialog
-          bool? shouldDiscard = await showDialog<bool>(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.0),
-                  side: BorderSide(color: Color(0xFF7400A5), width: 1.0), // Add this line for the border
-                ),
-                title: Column(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/images/bondlogog.svg', // Use the SVG file path
-                      width: 25.w, // Adjust size as needed
-                      height: 50.h,
-                    ),
-                    SizedBox(height: 12.h),
-                    Text(
-                      'Discard Post',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+    if (!_isMessagesLoaded || userid == null) {
+      return CompleteChatShimmer();
+    }
+
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.lightText
+            : AppColors.darkText,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.lightText
+              : AppColors.darkText,
+          title: FittedBox(
+            child: GestureDetector(
+              onTap: () {
+                if (widget.chatRoom.roomType == 'group') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Particiapntgrp(
+                        chatRoomId: widget.chatRoom.chatRoomId,
+                        chatRoom: widget.chatRoom,
                       ),
-                      textAlign: TextAlign.center,
                     ),
-                  ],
-                ),
-                content: Text(
-                  'You have unsaved changes,\nDo you want to discard?',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
-                    fontSize: 14,
-                  ),
-                ),
-                actionsAlignment: MainAxisAlignment.center,
-                actionsPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                actions: [
-                  SizedBox(
-                    width: 120,
-                    child: ElevatedButton(
+                  ).then((_) {
+                    // Refresh when returning from Particiapntgrp
+                    forceRefresh();
+                  });
+                }
+              },
+              child: Row(
+                children: [
+                  IconButton(
                       onPressed: () {
-                        Navigator.of(context).pop(false); // Cancel
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => BottomNavBarScreen()));
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black87,
-                        elevation: 0,
-                        side: BorderSide(color: Colors.grey[300]!),
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                      icon: Icon(Icons.arrow_back_ios)),
+                  InkWell(
+                    onTap: () {
+                      print(widget.chatRoom.participants.first.name);
+                    },
+                    child: GestureDetector(
+                        onTap: () {
+                          if (widget.chatRoom.roomType == 'group') {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => EditGroupScreen(
+                                        chatRoomId: widget.chatRoom.chatRoomId,
+                                        onGroupUpdated: forceRefresh)));
+                          }
+                        },
+                        child: CircleAvatar(
+                          backgroundColor: Color(0xFF7400A5),
+                          backgroundImage: widget.chatRoom.roomType == 'dm'
+                              ? widget.chatRoom.participants.first.profilePic !=
+                                      null
+                                  ? NetworkImage(widget
+                                      .chatRoom.participants.first.profilePic!)
+                                  : const AssetImage(
+                                      'assets/images/profile.png')
+                              : widget.chatRoom.groupProfile != null
+                                  ? NetworkImage(widget.chatRoom.groupProfile!)
+                                  : null,
+                          child: widget.chatRoom.roomType != 'dm' &&
+                                  widget.chatRoom.groupProfile == null
+                              ? Padding(
+                                  padding: const EdgeInsets.all(6.0),
+                                  child: SvgPicture.asset(
+                                    'assets/icons/group.svg',
+                                    width: 32,
+                                    height: 32,
+                                    fit: BoxFit.contain,
+                                  ),
+                                )
+                              : null,
                         ),
-                      ),
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                        ),
                   ),
-                  SizedBox(width: 16),
-                  SizedBox(
-                    width: 120,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BottomNavBarScreen()));
+                  SizedBox(width: 6.w),
+                  if (widget.chatRoom.roomType == 'dm')
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => UserProfileScreen(
+                                    userId: widget
+                                        .chatRoom.participants.first.userId)));
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF7400A5),
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Text(
-                        'Discard',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
-          );
-
-          if (shouldDiscard == true) {
-            // Clear the state before popping
-            _controller.clear();
-            _selectedImages.clear();
-            Navigator.of(context).pop(true); // Explicitly pop with result
-          }
-          return shouldDiscard ?? false; // Prevent default back behavior
-        } else {
-          // No unsaved changes, navigate normally
-          // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BottomNavBarScreen()));
-          // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BottomNavBarScreen()));
-          // return false;
-          Navigator.of(context).pop(true);
-          return true;
-        }
-      },
-      child: SafeArea(
-        child: Scaffold(
-          resizeToAvoidBottomInset: true, // Ensure keyboard adjusts the layout
-          // SafeArea will ensure layout respects system insets
-          body: SafeArea(
-            // Use bottom: false to ensure content can extend to the bottom edge
-            bottom: false,
-            child: Stack(
-              children: [
-                // Gradient Background
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: Theme.of(context).brightness == Brightness.dark ? [Colors.black, Colors.black] : AppColors.lightGradient),
-                  ),
-                ),
-                // Main Content with Footer Space
-                Column(
-                  children: [
-                    // Top Bar
-                    Container(
-                      decoration: BoxDecoration(color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          left: 16,
-                          right: 16,
-                          top: 10, // Reduced from 50 since we're using SafeArea
-                          bottom: 18,
-                        ),
-                        child: Row(
-                          children: [
-                            InkWell(
-                              onTap: () async {
-                                // Check if there's unsaved content
-                                if (_controller.text.isNotEmpty || _selectedImages.isNotEmpty) {
-                                  // Show confirmation dialog
-                                  bool? shouldDiscard = await showDialog<bool>(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(16.0),
-                                          side: BorderSide(color: Color(0xFF7400A5), width: 1.0),
-                                        ),
-                                        title: Column(
-                                          children: [
-                                            SvgPicture.asset(
-                                              'assets/images/bondlogog.svg',
-                                              width: 25.w,
-                                              height: 50.h,
-                                            ),
-                                            SizedBox(height: 12.h),
-                                            Text(
-                                              'Discard Post',
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ],
-                                        ),
-                                        content: Text(
-                                          'You have unsaved changes,\nDo you want to discard?',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                        actionsAlignment: MainAxisAlignment.center,
-                                        actionsPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                        actions: [
-                                          SizedBox(
-                                            width: 120,
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop(false); // Cancel
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.white,
-                                                foregroundColor: Colors.black87,
-                                                elevation: 0,
-                                                side: BorderSide(color: Colors.grey[300]!),
-                                                padding: EdgeInsets.symmetric(vertical: 12),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(8),
-                                                ),
-                                              ),
-                                              child: Text(
-                                                'Cancel',
-                                                style: TextStyle(fontWeight: FontWeight.bold),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(width: 16),
-                                          SizedBox(
-                                            width: 120,
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BottomNavBarScreen()));
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Color(0xFF7400A5),
-                                                foregroundColor: Colors.white,
-                                                elevation: 0,
-                                                padding: EdgeInsets.symmetric(vertical: 12),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(8),
-                                                ),
-                                              ),
-                                              child: Text(
-                                                'Discard',
-                                                style: TextStyle(fontWeight: FontWeight.bold),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-
-                                  if (shouldDiscard == true) {
-                                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BottomNavBarScreen()));
-                                  }
-                                } else {
-                                  // No unsaved changes, navigate directly
-                                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BottomNavBarScreen()));
-                                }
-                              },
-                              child: Icon(
-                                Icons.arrow_back_ios,
-                                color: Theme.of(context).brightness == Brightness.dark ? Colors.white60 : Colors.black,
-                                size: 20,
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            CircleAvatar(
-                              radius: 16,
-                              backgroundColor: Colors.grey[300],
-                              child: userProvider.profilePic != null
-                                  ? ClipOval(
-                                      child: Image.network(
-                                        userProvider.profilePic!,
-                                        fit: BoxFit.cover,
-                                        width: 32,
-                                        height: 32,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          print("Error loading profile image: $error");
-                                          return Icon(Icons.person, color: Colors.grey[600]);
-                                        },
-                                      ),
-                                    )
-                                  : Icon(Icons.person, color: Colors.grey[600]),
-                            ),
-                            SizedBox(width: 8),
-                            FittedBox(
-                              child: Text(
-                                'Make a Post',
-                                style: GoogleFonts.roboto(
-                                  color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText,
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                            Spacer(),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 15),
-                              child: InkWell(
-                                onTap: () async {
-                                  if (userid == null || token == null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Center(child: Text('Something went wrong'))),
-                                    );
-                                    return;
-                                  }
-                                  ;
-                                  if (_controller.text.isEmpty && _selectedImages.isEmpty) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('Please add a caption or image'),
-                                      ),
-                                    );
-                                    return;
-                                  }
-                                  ;
-                                  _post();
-                                },
-                                child: Container(
-                                  height: 35.h,
-                                  width: 65.w,
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFF7400A5),
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                  child: Center(
-                                    child: _isLoading
-                                        ? LoadingAnimationWidget.waveDots(
-                                            color: Colors.white,
-                                            size: 20,
-                                          )
-                                        : Text(
-                                            'Post',
-                                            style: GoogleFonts.montserrat(
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.w700,
-                                              color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.darkText,
-                                            ),
-                                          ),
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    // Text Input Area with space for bottom buttons
-                    Expanded(
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          widget.communityId != null
-                              ? SizedBox(
-                                  width: double.infinity,
-                                  child: CustomDropdown(
-                                    onSelectionChanged: (isAnonymous) {
-                                      _toggleAnonymous();
-                                    },
-                                  ))
-                              : const SizedBox.shrink(),
-
-                          Expanded(
-                            child: SingleChildScrollView(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  TextField(
-                                      controller: _controller,
-                                      focusNode: _focusNode,
-                                      autofocus: true,
-                                      maxLength: 150, // Add this line to limit to 150 characters
-                                      maxLengthEnforcement: MaxLengthEnforcement.enforced, // Add this to enforce the limit
-                                      inputFormatters: [
-                                        LengthLimitingTextInputFormatter(150),
-                                      ],
-                                      style: TextStyle(
-                                        color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText,
-                                      ),
-                                      maxLines: null,
-                                      decoration: InputDecoration(
-                                        hintText: 'What\'s On Your Mind...',
-                                        hintStyle: GoogleFonts.roboto(
-                                          color: Colors.grey[600],
-                                          fontSize: 14.sp,
-                                        ),
-                                        border: InputBorder.none,
-                                        contentPadding: EdgeInsets.all(16),
-                                        counterText: '$_characterCount/150',
-                                      ),
-                                      onChanged: (text) {
-                                        setState(() {
-                                          _characterCount = text.length;
-                                        });
-                                      }),
-
-                                  if (_selectedImages.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                                      child: Column(
-                                        children: [
-                                          CarouselSlider(
-                                            options: CarouselOptions(
-                                              height: MediaQuery.of(context).size.height * 0.40,
-                                              viewportFraction: 1.0,
-                                              enableInfiniteScroll: false,
-                                              autoPlay: false,
-                                            ),
-                                            items: _selectedImages.asMap().entries.map((entry) {
-                                              final index = entry.key;
-                                              final file = entry.value;
-
-                                              return Builder(
-                                                builder: (BuildContext context) {
-                                                  if (isVideo(file)) {
-                                                    // Display video with VideoPlayer
-                                                    return VideoPlayerWidget(
-                                                      videoFile: file,
-                                                      onRemove: () => _removeImage(index),
-                                                    );
-                                                  } else {
-                                                    // Display image
-                                                    return Stack(
-                                                      children: [
-                                                        Container(
-                                                          width: double.infinity,
-                                                          height: MediaQuery.of(context).size.height * 0.40,
-                                                          child: Image.file(
-                                                            File(file.path),
-                                                            fit: BoxFit.contain,
-                                                          ),
-                                                        ),
-                                                        Positioned(
-                                                          right: 10,
-                                                          top: 10,
-                                                          child: GestureDetector(
-                                                            onTap: () => _removeImage(index),
-                                                            child: Container(
-                                                              padding: EdgeInsets.all(4),
-                                                              decoration: BoxDecoration(
-                                                                color: Colors.black.withOpacity(0.5),
-                                                                shape: BoxShape.circle,
-                                                              ),
-                                                              child: Icon(Icons.close, color: Colors.white),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    );
-                                                  }
-                                                },
-                                              );
-                                            }).toList(),
-                                          ),
-                                          // Image count indicator
-                                          if (_selectedImages.length > 1)
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 8.0),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Container(
-                                                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.black.withOpacity(0.6),
-                                                      borderRadius: BorderRadius.circular(12),
-                                                    ),
-                                                    child: Text(
-                                                      '${_selectedImages.length} Photos',
-                                                      style: GoogleFonts.roboto(
-                                                        color: Colors.white,
-                                                        fontSize: 12.sp,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-
-                                  // Display Selected Image (if any)
-                                  if (_selectedImage != null)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                                      child: Container(
-                                        height: MediaQuery.of(context).size.height * 0.40,
-                                        width: MediaQuery.of(context).size.width,
-                                        child: Image.file(
-                                          File(_selectedImage!.path),
-                                          fit: BoxFit.cover,
-                                          width: double.infinity,
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
+                          Text(
+                            truncateName(
+                                widget.chatRoom.participants.first.name ?? ""),
+                            style: GoogleFonts.roboto(
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                             ),
                           ),
-
-                          // Bottom Action Buttons - Fixed at bottom
-                          Container(
-                            padding: EdgeInsets.only(
-                              bottom: MediaQuery.of(context).padding.bottom > 0
-                                  ? MediaQuery.of(context).padding.bottom + 1.h
-                                  : 20.h, // Add extra padding for navigation bar
-                              top: 10.h,
-                              left: 16.w,
-                              right: 16.w,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.grey[100],
-                              border: Border(
-                                top: BorderSide(
-                                  color:
-                                      Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : (Colors.grey[200] ?? Colors.grey),
-                                  width: 0.5,
-                                ),
+                          if (lastSeen.isNotEmpty)
+                            Text(
+                              lastSeen,
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: const Color.fromARGB(255, 185, 184, 184),
                               ),
                             ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(54.r),
-                                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.grey[100],
-                                    border: Border.all(color: const Color(0xFF7400A5)),
-                                  ),
-                                  child: GestureDetector(
-                                    onTap: _isLoading ? null : _selectAndRewriteText,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        SizedBox(width: 4.w),
-                                        Text(
-                                          'Re-write with ',
-                                          style: GoogleFonts.roboto(
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w400,
-                                            color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText,
-                                          ),
-                                        ),
-                                        ShaderMask(
-                                          blendMode: BlendMode.srcIn,
-                                          shaderCallback: (bounds) => const LinearGradient(
-                                            begin: Alignment.bottomLeft,
-                                            end: Alignment.topRight,
-                                            colors: [
-                                              Color(0xFF3B01B7), // Dark purple (bottom left)
-                                              Color(0xFF5E00FF), // Purple
-                                              Color(0xFFBA19EB), // Pink-purple
-                                              Color(0xFFDD0CC8), // Pink (top right)
-                                            ],
-                                          ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
-                                          child: Text(
-                                            'BondChat',
-                                            style: GoogleFonts.roboto(
-                                              fontSize: 16.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white, // This color will be replaced by the gradient
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(width: 5.w),
-                                        SvgPicture.asset(
-                                          'assets/icons/bondchat_star.svg',
-                                          width: 15.w,
-                                          height: 15.h,
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                const Spacer(),
-                                IconButton(
-                                  iconSize: 24.sp,
-                                  icon: Icon(
-                                    _isListening ? Icons.mic : Icons.mic_none,
-                                    color: _isListening
-                                        ? const Color(0xFF7400A5) // Purple when active
-                                        : (Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText),
-                                  ),
-                                  onPressed: () {
-                                    if (_isListening) {
-                                      _stopListening();
-                                    } else {
-                                      _startListening();
-                                    }
-                                  },
-                                ),
-                                IconButton(
-                                  iconSize: 24.sp,
-                                  icon: Icon(
-                                    Icons.perm_media_outlined,
-                                    color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText,
-                                  ),
-                                  onPressed: _pickMedia,
-                                ),
-                                IconButton(
-                                  iconSize: 24.sp,
-                                  icon: Icon(
-                                    Icons.camera_alt_outlined,
-                                    color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText,
-                                  ),
-                                  onPressed: () async {
-                                    final XFile? image = await _picker.pickImage(
-                                      source: ImageSource.camera,
-                                      imageQuality: 70, // Add image quality parameter to reduce file size
-                                    );
-                                    if (image != null) {
-                                      // Compress the image before adding to list
-                                      final File? compressedFile = await _compressImage(File(image.path));
-                                      if (compressedFile != null) {
-                                        setState(() {
-                                          _selectedImages.add(XFile(compressedFile.path));
-                                        });
-                                      }
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
                         ],
                       ),
                     ),
+                  if (widget.chatRoom.roomType == 'group')
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          truncateName(widget.chatRoom.groupName!),
+                          style: TextStyle(
+                              fontSize: 28.sp,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black),
+                        ),
+                        Text(
+                          'Group',
+                          style: TextStyle(
+                              fontSize: 12.sp,
+                              color: const Color.fromARGB(255, 185, 184, 184)),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+          ),
+          iconTheme: IconThemeData(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppColors.darkText
+                : AppColors.lightText,
+          ),
+          actions: [
+            // if (widget.chatRoom.roomType == 'group')
+            //   IconButton(
+            //     icon: Icon(Icons.more_vert),
+            //     onPressed: () {
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //           builder: (context) => EditGroupScreen(
+            //             chatRoomId: widget.chatRoom.chatRoomId,
+            //             onGroupUpdated: forceRefresh,
+            //           ),
+            //         ),
+            //       );
+            //     },
+            //   ),
+            // widget.chatRoom.roomType == 'group'
+            //     ? SizedBox(width: 0)
+            //     : IconButton(
+            //         onPressed: () {
+            //           widget.chatRoom.roomType == 'group'
+            //               ? showAddFriendsSheet(
+            //                   context, participantsMap, 'audio')
+            //               : startCall(widget.chatRoom.participants.first.userId,
+            //                   "audio", false);
+            //         },
+            //         icon: Icon(Icons.call, color: Color(0xFF7400A5)),
+            //       ),
+            SizedBox(
+              width: 8.w,
+            ),
+            // widget.chatRoom.roomType == 'group'
+            //     ? SizedBox(
+            //         width: 0,
+            //       )
+            //     : IconButton(
+            //         onPressed: () {
+            //           widget.chatRoom.roomType == 'group'
+            //               ? showAddFriendsSheet(
+            //                   context, participantsMap, 'video')
+            //               : startCall(widget.chatRoom.participants.first.userId,
+            //                   "video", false);
+            //         },
+            //         icon: Icon(Icons.video_call, color: Color(0xFF7400A5))),
+            SizedBox(
+              width: 8.w,
+            )
+          ],
+        ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: PagedListView<int, Message>(
+                  pagingController: _pagingController,
+                  reverse: true,
+                  builderDelegate: PagedChildBuilderDelegate<Message>(
+                      itemBuilder: (context, message, index) {
+                    final isSender = message.senderId == userid;
+                    // Find the replied message if this message is a reply
+                    Message? repliedMessage;
+                    if (message.replyToMessageId != null) {
+                      repliedMessage =
+                          _findMessageById(message.replyToMessageId!);
+                      print(' Processing message ${message.id}:');
+                      print(
+                          '  ↪️ Is Reply: ${message.replyToMessageId != null}');
+                      print('  📝 Content: ${message.content}');
+                      print('  🔍 Reply To ID: ${message.replyToMessageId}');
+                      print(
+                          '  📨 Found Reply Message: ${repliedMessage != null}');
+                      if (repliedMessage != null) {
+                        print('  💬 Reply Content: ${repliedMessage.content}');
+                      }
+                    }
+
+                    return Builder(
+                      builder: (context) => InkWell(
+                        onLongPress: () {
+                          // Get the position of the message bubble
+                          final RenderBox? renderBox =
+                              context.findRenderObject() as RenderBox?;
+                          if (renderBox != null) {
+                            final position =
+                                renderBox.localToGlobal(Offset.zero);
+                            final size = renderBox.size;
+
+                            showDialog(
+                              context: context,
+                              barrierColor: Colors.transparent,
+                              builder: (context) => ReactionPopupModal(
+                                onReactionSelected: (reactionType) {
+                                  _updateMessageReaction(
+                                      message.id, reactionType);
+                                },
+                                currentReaction: message.currentUserReaction,
+                                isSender: isSender,
+                                position: position,
+                                messageSize: size,
+                              ),
+                            );
+                          }
+                        },
+                        child: MessageBubble(
+                          message:
+                              message.copyWith(replyToMessage: repliedMessage),
+                          isSender: isSender,
+                          participantsMap: participantsMap,
+                          currentUserId: userid!,
+                          reactions: message.reactions ?? [],
+                          onReactionSelected: (messageId, reactionType) {
+                            _updateMessageReaction(messageId, reactionType);
+                          },
+                          onReply: (message) {
+                            _setReplyingToMessage(message);
+                          },
+                        ),
+                      ),
+                    );
+                  }, noItemsFoundIndicatorBuilder: (context) {
+                    return Center(
+                      child: Text(
+                        'No Messages Yet. Start The Conversation',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+              if (widget.chatRoom.roomType == 'group' &&
+                  !widget.chatRoom.isPart)
+                Container(
+                  padding: EdgeInsets.all(8),
+                  color: Colors.red.withOpacity(0.1),
+                  child: Center(
+                    child: Text(
+                      'You have left this group',
+                      style: GoogleFonts.poppins(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              if (_replyingToMessage != null)
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[800]
+                        : Colors.grey[200],
+                    border: Border(
+                      top: BorderSide(
+                        color: Colors.grey.shade400,
+                        width: 0.5,
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Replying to ${participantsMap[_replyingToMessage!.senderId]?.name ?? 'User'}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: Color(0xFF7400A5),
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              _replyingToMessage!.content,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.close),
+                        onPressed: () {
+                          setState(() {
+                            _replyingToMessage = null;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    isNewConversation
+                        ? FutureBuilder<List<String>>(
+                            future: _randomTextFuture,
+                            builder: (context, snapshot) {
+                              if (!isNewConversation)
+                                return const SizedBox.shrink();
+
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return SizedBox(
+                                  height: 80,
+                                  child: Shimmer.fromColors(
+                                    baseColor: Colors.purple[300]!,
+                                    highlightColor: Colors.purple[100]!,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: 3,
+                                      itemBuilder: (context, index) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8.0),
+                                          child: Container(
+                                            width: 250,
+                                            padding: const EdgeInsets.all(12),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                );
+                              } else if (snapshot.hasError) {
+                                return SizedBox(
+                                  height: 80,
+                                  child: Center(
+                                      child: Text('Error: ${snapshot.error}')),
+                                );
+                              } else {
+                                final List<String> suggestions =
+                                    snapshot.data ?? [];
+                                if (suggestions.isEmpty) {
+                                  return const SizedBox.shrink();
+                                }
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10.0, vertical: 4.0),
+                                        child: Text(
+                                          'BondChat Suggestions',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color:
+                                                Theme.of(context).brightness ==
+                                                        Brightness.dark
+                                                    ? AppColors.darkText
+                                                    : AppColors.lightText,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 90,
+                                        child: ListView.builder(
+                                          scrollDirection: Axis.horizontal,
+                                          itemCount: suggestions.length,
+                                          itemBuilder: (context, index) {
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8.0),
+                                              child: GestureDetector(
+                                                onTap: () => _copyAndPasteText(
+                                                    suggestions[index]),
+                                                child: Container(
+                                                  width: 250,
+                                                  padding:
+                                                      const EdgeInsets.all(12),
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        const Color(0xFF7400A5),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                  ),
+                                                  child: Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      const Icon(Icons.message,
+                                                          color: Colors.white),
+                                                      const SizedBox(width: 8),
+                                                      Expanded(
+                                                        child: Text(
+                                                          suggestions[index],
+                                                          maxLines: 3,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                            },
+                          )
+                        : const SizedBox.shrink(),
+                    Row(
+                      children: [
+                        // IconButton(
+                        //   icon: Icon(Icons.photo_library,
+                        //       color: Color(0xFF7400A5)),
+                        //   onPressed: _pickAndSendMedia,
+                        // ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.grey[900]
+                                    : Colors.grey[200],
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
+                                child: TextField(
+                                  controller: _controller,
+                                  enabled:
+                                      widget.chatRoom.roomType != 'group' ||
+                                          widget.chatRoom.isPart,
+                                  style: TextStyle(
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? AppColors.darkText
+                                        : AppColors.lightText,
+                                  ),
+                                  decoration: InputDecoration(
+                                    hintText:
+                                        widget.chatRoom.roomType == 'group' &&
+                                                !widget.chatRoom.isPart
+                                            ? 'You have left this group'
+                                            : 'Type A Message...',
+                                    hintStyle: GoogleFonts.poppins(
+                                        color: Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.white60
+                                            : AppColors.lightText),
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        if (widget.chatRoom.roomType != 'group' ||
+                            widget.chatRoom.isPart)
+                          Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF7400A5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: IconButton(
+                              icon: Icon(Icons.send, color: Colors.white),
+                              onPressed: () {
+                                if (_replyingToMessage != null) {
+                                  _sendReplyMessage();
+                                } else {
+                                  _sendMessage();
+                                }
+                              },
+                            ),
+                          ),
+                      ],
+                    ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
-}
-
-class VideoPlayerWidget extends StatefulWidget {
-  final XFile videoFile;
-  final VoidCallback onRemove;
-
-  const VideoPlayerWidget({
-    super.key,
-    required this.videoFile,
-    required this.onRemove,
-  });
-
-  @override
-  State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
-}
-
-class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
-  late final Player _player;
-  late final VideoController _videoController;
-  bool _isPlaying = false;
-  double? _aspectRatio;
-
-  StreamSubscription<int?>? _widthSubscription;
-  StreamSubscription<int?>? _heightSubscription;
-  StreamSubscription<bool>? _playingSubscription;
-
-  int? _videoWidth;
-  int? _videoHeight;
-
-  @override
-  void initState() {
-    super.initState();
-    _player = Player();
-    _videoController = VideoController(_player);
-
-    _player.open(Media(widget.videoFile.path), play: false);
-
-    _playingSubscription = _player.stream.playing.listen((playing) {
-      if (mounted) {
-        setState(() {
-          _isPlaying = playing;
-        });
-      }
-    });
-
-    _widthSubscription = _player.stream.width.listen((width) {
-      if (mounted && width != null) {
-        setState(() {
-          _videoWidth = width;
-          _updateAspectRatio();
-        });
-      }
-    });
-
-    _heightSubscription = _player.stream.height.listen((height) {
-      if (mounted && height != null) {
-        setState(() {
-          _videoHeight = height;
-          _updateAspectRatio();
-        });
-      }
-    });
-  }
-
-  void _updateAspectRatio() {
-    if (_videoWidth != null && _videoHeight != null && _videoHeight! > 0) {
-      if (mounted) {
-        setState(() {
-          _aspectRatio = _videoWidth! / _videoHeight!;
-        });
-      }
-    }
-  }
 
   @override
   void dispose() {
-    _playingSubscription?.cancel();
-    _widthSubscription?.cancel();
-    _heightSubscription?.cancel();
-    _player.dispose();
+    // Dispose controllers and other resources
+    _pagingController.dispose();
+    _controller.dispose();
+
+    // Clear the message handler to avoid memory leaks
+    //  _socketService.onMessageReceived = null;
+
+    // Emit the "leave" event when leaving the page
+    if (_socketService.isConnected) {
+      _socketService.socket.emit('leave', widget.chatRoom.chatRoomId);
+      print('✅ Emitted leave event for room: ${widget.chatRoom.chatRoomId}');
+    }
+
     super.dispose();
   }
+}
+
+class ReactionPopupModal extends StatelessWidget {
+  final Function(String) onReactionSelected;
+  final String? currentReaction;
+  final bool isSender;
+  final Offset position;
+  final Size messageSize;
+
+  const ReactionPopupModal({
+    Key? key,
+    required this.onReactionSelected,
+    this.currentReaction,
+    required this.isSender,
+    required this.position,
+    required this.messageSize,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Calculate the position based on screen size and message position
+    final screenSize = MediaQuery.of(context).size;
+    final popupWidth = 200.0;
+    final popupHeight = 80.0;
+
+    double left;
+    double top;
+
+    // Position horizontally
+    if (isSender) {
+      left = position.dx - popupWidth + messageSize.width;
+    } else {
+      left = position.dx;
+    }
+
+    // Ensure the popup stays within screen bounds
+    if (left + popupWidth > screenSize.width) {
+      left = screenSize.width - popupWidth;
+    }
+    if (left < 0) {
+      left = 0;
+    }
+
+    // Position vertically
+    top = position.dy - popupHeight - 10;
+    if (top < 0) {
+      top = position.dy + messageSize.height + 10;
+    }
+
     return Stack(
-      alignment: Alignment.center,
       children: [
-        Center(
-          child: _aspectRatio == null || _aspectRatio! <= 0
-              ? const AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: Center(child: CircularProgressIndicator()),
-                )
-              : AspectRatio(
-                  aspectRatio: _aspectRatio!,
-                  child: Video(controller: _videoController),
-                ),
-        ),
-        Positioned(
-          right: 10,
-          top: 10,
+        // Semi-transparent background
+        Positioned.fill(
           child: GestureDetector(
-            onTap: widget.onRemove,
+            onTap: () => Navigator.pop(context),
             child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.close, color: Colors.white, size: 20),
+              color: Colors.black.withOpacity(0.1),
             ),
           ),
         ),
-        Center(
-          child: IconButton(
-            icon: Icon(
-              _isPlaying ? Icons.pause : Icons.play_arrow,
-              color: Colors.white,
-              size: 50,
+        // Reaction popup
+        Positioned(
+          left: left,
+          top: top,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              width: popupWidth,
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[900]
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: ReactionConstants.availableReactionTypes
+                    .map((reactionType) {
+                  final emoji =
+                      ReactionConstants.reactionTypeToEmoji[reactionType]!;
+                  final isSelected = currentReaction == reactionType;
+
+                  return GestureDetector(
+                    onTap: () {
+                      onReactionSelected(reactionType);
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? Colors.purple.withOpacity(0.2)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        emoji,
+                        style: TextStyle(fontSize: 24),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
-            onPressed: () {
-              _player.playOrPause();
-            },
           ),
         ),
       ],
