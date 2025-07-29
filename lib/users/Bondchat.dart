@@ -80,12 +80,8 @@ class ChatMessage {
     List<UserRecommendation>? users;
 
     // Check if content is a map with 'users' array
-    if (messageContent is Map<String, dynamic> &&
-        messageContent.containsKey('users') &&
-        messageContent['users'] is List) {
-      users = (messageContent['users'] as List)
-          .map((user) => UserRecommendation.fromJson(user))
-          .toList();
+    if (messageContent is Map<String, dynamic> && messageContent.containsKey('users') && messageContent['users'] is List) {
+      users = (messageContent['users'] as List).map((user) => UserRecommendation.fromJson(user)).toList();
 
       // Extract just the text message part
       messageContent = messageContent['message'] ?? '';
@@ -95,9 +91,7 @@ class ChatMessage {
       id: json['_id'] ?? json['id'] ?? DateTime.now().toString(),
       content: messageContent,
       senderId: json['senderId'],
-      createdAt: json['timestamp'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['timestamp'] * 1000)
-          : DateTime.parse(json['createdAt'] ?? DateTime.now().toString()),
+      createdAt: json['timestamp'] != null ? DateTime.fromMillisecondsSinceEpoch(json['timestamp'] * 1000) : DateTime.parse(json['createdAt'] ?? DateTime.now().toString()),
       media: json['media'],
       entity: json['entity'] ?? '',
       isBot: json['isBot'] ?? false,
@@ -107,14 +101,14 @@ class ChatMessage {
   }
 }
 
-class BondChatScreen extends StatefulWidget {
-  const BondChatScreen({Key? key}) : super(key: key);
+class ancoChatScreen extends StatefulWidget {
+  const ancoChatScreen({Key? key}) : super(key: key);
 
   @override
-  _BondChatScreenState createState() => _BondChatScreenState();
+  _ancoChatScreenState createState() => _ancoChatScreenState();
 }
 
-class _BondChatScreenState extends State<BondChatScreen> {
+class _ancoChatScreenState extends State<ancoChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final SocketService _socketService = SocketService();
   final _pagingController = PagingController<int, ChatMessage>(firstPageKey: 1);
@@ -172,8 +166,7 @@ class _BondChatScreenState extends State<BondChatScreen> {
     _locationData = await location.getLocation();
     print("LOcation  $_locationData");
     setState(() {
-      _locationMessage =
-          'Latitude: ${_locationData!.latitude}, Longitude: ${_locationData!.longitude}';
+      _locationMessage = 'Latitude: ${_locationData!.latitude}, Longitude: ${_locationData!.longitude}';
     });
   }
 
@@ -214,11 +207,9 @@ class _BondChatScreenState extends State<BondChatScreen> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = jsonDecode(response.body);
         final List<dynamic> messagesList = responseData['messages'];
-        final messages =
-            messagesList.map((msg) => ChatMessage.fromJson(msg)).toList();
+        final messages = messagesList.map((msg) => ChatMessage.fromJson(msg)).toList();
 
-        final isLastPage =
-            responseData['currentPage'] >= responseData['totalPages'];
+        final isLastPage = responseData['currentPage'] >= responseData['totalPages'];
 
         if (isLastPage) {
           _pagingController.appendLastPage(messages);
@@ -251,8 +242,7 @@ class _BondChatScreenState extends State<BondChatScreen> {
 
       if (_token == null || _currentUserId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Center(child: Text('Authentication required'))),
+          const SnackBar(content: Center(child: Text('Authentication required'))),
         );
         return;
       }
@@ -264,10 +254,12 @@ class _BondChatScreenState extends State<BondChatScreen> {
           'token': _token!,
           'Content-Type': 'application/json',
         },
-        /*DEV BONDCHAT ID */
+        /*DEV ancoCHAT ID */
         //  body: jsonEncode({'userId2': '67d3bf8914c75ee094e30bfa'}),
-        /*PREPROD BONDCHAT ID */
-        body: jsonEncode({'userId2': '67f4ecba7f663162b8466076'}),
+        /*PREPROD ancoCHAT ID */
+        body: jsonEncode({
+          'userId2': '67f4ecba7f663162b8466076'
+        }),
       );
 
       print('Start message response: ${response.body}');
@@ -305,13 +297,12 @@ class _BondChatScreenState extends State<BondChatScreen> {
             if (!mounted) return; // Check if widget is still mounted
             setState(() {
               _isBotTyping = false;
-              _pagingController.itemList!
-                  .removeWhere((msg) => msg.id == 'typing_indicator');
+              _pagingController.itemList!.removeWhere((msg) => msg.id == 'typing_indicator');
               _pagingController.notifyListeners();
             });
           }
 
-          log('New message received: ${newMessage.id}', name: 'BondChatScreen');
+          log('New message received: ${newMessage.id}', name: 'ancoChatScreen');
           // log('New message received: ${msg.id}');
 
           // Check if message already exists in the list
@@ -324,9 +315,7 @@ class _BondChatScreenState extends State<BondChatScreen> {
               _pagingController.notifyListeners();
             });
 
-            if (_isSpeakerOn &&
-                message['isBot'] == true &&
-                message['media'] != null) {
+            if (_isSpeakerOn && message['isBot'] == true && message['media'] != null) {
               print("🎵 Polly audio detected, playing...");
               Future.microtask(() async {
                 if (!mounted) return; // Check if widget is still mounted
@@ -357,13 +346,11 @@ class _BondChatScreenState extends State<BondChatScreen> {
 
       // Decode base64 to binary data
       Uint8List audioBytes = base64Decode(base64Audio);
-      print(
-          "🎵 Base64 decoded successfully, audio size: ${audioBytes.length} bytes");
+      print("🎵 Base64 decoded successfully, audio size: ${audioBytes.length} bytes");
 
       // Get temporary directory
       Directory tempDir = await getTemporaryDirectory();
-      String filePath =
-          '${tempDir.path}/polly_audio_${DateTime.now().millisecondsSinceEpoch}.mp3';
+      String filePath = '${tempDir.path}/polly_audio_${DateTime.now().millisecondsSinceEpoch}.mp3';
 
       // Save audio file
       File audioFile = File(filePath);
@@ -442,8 +429,7 @@ class _BondChatScreenState extends State<BondChatScreen> {
       setState(() {
         _isBotTyping = true;
         // Remove any existing typing indicator first
-        _pagingController.itemList!
-            .removeWhere((msg) => msg.id == 'typing_indicator');
+        _pagingController.itemList!.removeWhere((msg) => msg.id == 'typing_indicator');
         // Add new typing indicator
         _pagingController.itemList!.insert(
             0,
@@ -528,10 +514,7 @@ class _BondChatScreenState extends State<BondChatScreen> {
       appBar: AppBar(
         leading: IconButton(
             onPressed: () {
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const BottomNavBarScreen()));
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const BottomNavBarScreen()));
             },
             icon: const Icon(
               Icons.arrow_back_ios_new,
@@ -556,8 +539,7 @@ class _BondChatScreenState extends State<BondChatScreen> {
                 padding: const EdgeInsets.all(6.0),
                 child: Text(
                   'Basic',
-                  style:
-                      GoogleFonts.poppins(fontSize: 10.sp, color: Colors.white),
+                  style: GoogleFonts.poppins(fontSize: 10.sp, color: Colors.white),
                 ),
               ),
             )
@@ -579,8 +561,7 @@ class _BondChatScreenState extends State<BondChatScreen> {
               // Male Voices Header
               const PopupMenuItem(
                 enabled: false,
-                child:
-                    Text('Male Voices', style: TextStyle(color: Colors.grey)),
+                child: Text('Male Voices', style: TextStyle(color: Colors.grey)),
               ),
               // Michael (selected)
               PopupMenuItem(
@@ -591,8 +572,7 @@ class _BondChatScreenState extends State<BondChatScreen> {
                     const SizedBox(width: 8),
                     const Text('Michael'),
                     const Spacer(),
-                    if (_selectedVoice == 'male')
-                      const Icon(Icons.check, color: Colors.grey),
+                    if (_selectedVoice == 'male') const Icon(Icons.check, color: Colors.grey),
                   ],
                 ),
               ),
@@ -627,8 +607,7 @@ class _BondChatScreenState extends State<BondChatScreen> {
               // Female Voices Header
               const PopupMenuItem(
                 enabled: false,
-                child:
-                    Text('Female Voices', style: TextStyle(color: Colors.grey)),
+                child: Text('Female Voices', style: TextStyle(color: Colors.grey)),
               ),
               // Vanessa
               PopupMenuItem(
@@ -639,8 +618,7 @@ class _BondChatScreenState extends State<BondChatScreen> {
                     const SizedBox(width: 8),
                     const Text('Vanessa'),
                     const Spacer(),
-                    if (_selectedVoice == 'female')
-                      const Icon(Icons.check, color: Colors.grey),
+                    if (_selectedVoice == 'female') const Icon(Icons.check, color: Colors.grey),
                   ],
                 ),
               ),
@@ -686,8 +664,7 @@ class _BondChatScreenState extends State<BondChatScreen> {
 
               // Immediately update the audio player's volume
               await _audioPlayer.setVolume(_isSpeakerOn ? 1.0 : 0.0);
-              print(
-                  "👂 Speaker toggled: ${_isSpeakerOn ? 'ON' : 'OFF'}, Volume set to: ${_isSpeakerOn ? 1.0 : 0.0}");
+              print("👂 Speaker toggled: ${_isSpeakerOn ? 'ON' : 'OFF'}, Volume set to: ${_isSpeakerOn ? 1.0 : 0.0}");
             },
           )
         ],
@@ -707,18 +684,15 @@ class _BondChatScreenState extends State<BondChatScreen> {
                           PagedListView<int, ChatMessage>(
                             pagingController: _pagingController,
                             reverse: true,
-                            builderDelegate:
-                                PagedChildBuilderDelegate<ChatMessage>(
+                            builderDelegate: PagedChildBuilderDelegate<ChatMessage>(
                               itemBuilder: (context, message, index) {
                                 // Special case for typing indicator
                                 if (message.isTypingIndicator) {
                                   return Align(
                                     alignment: Alignment.centerLeft,
                                     child: Container(
-                                      margin: EdgeInsets.symmetric(
-                                          vertical: 5.h, horizontal: 5.w),
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 2.w, vertical: 5.h),
+                                      margin: EdgeInsets.symmetric(vertical: 5.h, horizontal: 5.w),
+                                      padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 5.h),
                                       width: 50.w,
                                       height: 30.h,
                                       decoration: BoxDecoration(
@@ -730,8 +704,7 @@ class _BondChatScreenState extends State<BondChatScreen> {
                                         color: Colors.white,
                                         radius: 5,
                                         numberOfDots: 3,
-                                        animationDuration:
-                                            const Duration(milliseconds: 200),
+                                        animationDuration: const Duration(milliseconds: 200),
                                       ),
                                     ),
                                   );
@@ -741,163 +714,97 @@ class _BondChatScreenState extends State<BondChatScreen> {
                                 final isMe = message.senderId == _currentUserId;
                                 final isBot = message.isBot;
 
-                                if (message.userRecommendations != null &&
-                                    message.userRecommendations!.isNotEmpty) {
+                                if (message.userRecommendations != null && message.userRecommendations!.isNotEmpty) {
                                   return Column(
-                                    crossAxisAlignment: isMe
-                                        ? CrossAxisAlignment.end
-                                        : CrossAxisAlignment.start,
+                                    crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                                     children: [
                                       // Message bubble with text
                                       Align(
-                                        alignment: isMe
-                                            ? Alignment.centerRight
-                                            : Alignment.centerLeft,
+                                        alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
                                         child: Container(
-                                          margin: const EdgeInsets.symmetric(
-                                              vertical: 5, horizontal: 10),
+                                          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                                           padding: const EdgeInsets.all(12),
                                           decoration: BoxDecoration(
-                                            color: isMe
-                                                ? const Color(0xFF7400A5)
-                                                : Colors.grey.shade800,
-                                            borderRadius:
-                                                BorderRadius.circular(15),
+                                            color: isMe ? const Color(0xFF7400A5) : Colors.grey.shade800,
+                                            borderRadius: BorderRadius.circular(15),
                                           ),
                                           child: Text(
                                             message.content.toString(),
-                                            style: GoogleFonts.poppins(
-                                                color: Colors.white),
+                                            style: GoogleFonts.poppins(color: Colors.white),
                                           ),
                                         ),
                                       ),
 
                                       // User recommendations section
                                       Container(
-                                        margin: const EdgeInsets.symmetric(
-                                            vertical: 5, horizontal: 10),
+                                        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                                         child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             // User tiles
                                             ...message.userRecommendations!
                                                 .map((user) => GestureDetector(
                                                     onTap: () {
-                                                      Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  UserProfileScreen(
-                                                                      userId: user
-                                                                          .id)));
+                                                      Navigator.push(context, MaterialPageRoute(builder: (context) => UserProfileScreen(userId: user.id)));
                                                     },
                                                     child: Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              12),
-                                                      margin:
-                                                          const EdgeInsets.only(
-                                                              bottom: 8),
+                                                      padding: const EdgeInsets.all(12),
+                                                      margin: const EdgeInsets.only(bottom: 8),
                                                       decoration: BoxDecoration(
-                                                        color: Colors
-                                                            .grey.shade900,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(15),
+                                                        color: Colors.grey.shade900,
+                                                        borderRadius: BorderRadius.circular(15),
                                                         border: Border.all(
-                                                          color: const Color(
-                                                                  0xFF7400A5)
-                                                              .withOpacity(0.5),
+                                                          color: const Color(0xFF7400A5).withOpacity(0.5),
                                                           width: 1,
                                                         ),
                                                       ),
                                                       child: Row(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start, // Align items to the top
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
+                                                        crossAxisAlignment: CrossAxisAlignment.start, // Align items to the top
+                                                        mainAxisSize: MainAxisSize.min,
                                                         children: [
                                                           // Avatar
                                                           CircleAvatar(
-                                                            backgroundColor:
-                                                                const Color(
-                                                                        0xFF7400A5)
-                                                                    .withOpacity(
-                                                                        0.3),
+                                                            backgroundColor: const Color(0xFF7400A5).withOpacity(0.3),
                                                             radius: 20,
                                                             child: Text(
-                                                              user.name
-                                                                      .isNotEmpty
-                                                                  ? user.name[0]
-                                                                      .toUpperCase()
-                                                                  : '?',
-                                                              style: GoogleFonts
-                                                                  .poppins(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                              user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
+                                                              style: GoogleFonts.poppins(
+                                                                color: Colors.white,
+                                                                fontWeight: FontWeight.bold,
                                                               ),
                                                             ),
                                                           ),
-                                                          const SizedBox(
-                                                              width: 10),
+                                                          const SizedBox(width: 10),
                                                           Flexible(
                                                             // Add Flexible to allow text to wrap properly
                                                             child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
                                                               children: [
                                                                 Text(
                                                                   user.name,
-                                                                  style: GoogleFonts
-                                                                      .poppins(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
+                                                                  style: GoogleFonts.poppins(
+                                                                    color: Colors.white,
+                                                                    fontWeight: FontWeight.bold,
                                                                   ),
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
+                                                                  overflow: TextOverflow.ellipsis,
                                                                 ),
-                                                                const SizedBox(
-                                                                    height:
-                                                                        4), // Increased spacing
+                                                                const SizedBox(height: 4), // Increased spacing
                                                                 Text(
                                                                   'Interests: ${user.interests.join(", ")}',
-                                                                  style: GoogleFonts
-                                                                      .poppins(
-                                                                    color: Colors
-                                                                        .grey
-                                                                        .shade400,
-                                                                    fontSize:
-                                                                        12,
+                                                                  style: GoogleFonts.poppins(
+                                                                    color: Colors.grey.shade400,
+                                                                    fontSize: 12,
                                                                   ),
                                                                   maxLines: 2,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
+                                                                  overflow: TextOverflow.ellipsis,
                                                                 ),
-                                                                const SizedBox(
-                                                                    height:
-                                                                        4), // Increased spacing
+                                                                const SizedBox(height: 4), // Increased spacing
                                                                 Text(
                                                                   'Matching: ${user.matchingInterestsCount} interest${user.matchingInterestsCount != 1 ? "s" : ""}',
-                                                                  style: GoogleFonts
-                                                                      .poppins(
-                                                                    color: const Color(
-                                                                        0xFF7400A5),
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
+                                                                  style: GoogleFonts.poppins(
+                                                                    color: const Color(0xFF7400A5),
+                                                                    fontSize: 12,
+                                                                    fontWeight: FontWeight.w500,
                                                                   ),
                                                                 ),
                                                               ],
@@ -914,23 +821,17 @@ class _BondChatScreenState extends State<BondChatScreen> {
                                   );
                                 } else {
                                   return Align(
-                                    alignment: isMe
-                                        ? Alignment.centerRight
-                                        : Alignment.centerLeft,
+                                    alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
                                     child: Container(
-                                      margin: const EdgeInsets.symmetric(
-                                          vertical: 5, horizontal: 10),
+                                      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                                       padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
-                                        color: isMe
-                                            ? const Color(0xFF7400A5)
-                                            : Colors.grey.shade800,
+                                        color: isMe ? const Color(0xFF7400A5) : Colors.grey.shade800,
                                         borderRadius: BorderRadius.circular(15),
                                       ),
                                       child: Text(
                                         message.content,
-                                        style: GoogleFonts.poppins(
-                                            color: Colors.white),
+                                        style: GoogleFonts.poppins(color: Colors.white),
                                       ),
                                     ),
                                   );
@@ -940,82 +841,46 @@ class _BondChatScreenState extends State<BondChatScreen> {
                                 return Align(
                                   alignment: Alignment.bottomLeft,
                                   child: Padding(
-                                    padding: EdgeInsets.only(
-                                        bottom:
-                                            MediaQuery.of(context).size.height *
-                                                0.12,
-                                        left: 20),
+                                    padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.12, left: 20),
                                     child: RichText(
                                         textAlign: TextAlign.start,
-                                        text: TextSpan(
-                                            style: const TextStyle(height: 1.4),
-                                            children: [
-                                              TextSpan(
-                                                  text: 'Welcome,\n',
-                                                  style:
-                                                      GoogleFonts.leagueSpartan(
-                                                          fontSize: 40.sp,
-                                                          fontWeight:
-                                                              FontWeight.w900)),
-                                              TextSpan(
-                                                  text: "To  ",
-                                                  style:
-                                                      GoogleFonts.leagueSpartan(
-                                                          fontSize: 40.sp,
-                                                          fontWeight:
-                                                              FontWeight.w900)),
-                                              TextSpan(
-                                                text: "BondChat\n",
-                                                style:
-                                                    GoogleFonts.leagueSpartan(
-                                                  fontSize:
-                                                      45, // or use 45.sp if you're using ScreenUtil
+                                        text: TextSpan(style: const TextStyle(height: 1.4), children: [
+                                          TextSpan(text: 'Welcome,\n', style: GoogleFonts.leagueSpartan(fontSize: 40.sp, fontWeight: FontWeight.w900)),
+                                          TextSpan(text: "To  ", style: GoogleFonts.leagueSpartan(fontSize: 40.sp, fontWeight: FontWeight.w900)),
+                                          TextSpan(
+                                            text: "ancoChat\n",
+                                            style: GoogleFonts.leagueSpartan(
+                                              fontSize: 45, // or use 45.sp if you're using ScreenUtil
 
-                                                  fontWeight: FontWeight.w900,
-                                                  foreground: Paint()
-                                                    ..shader =
-                                                        const LinearGradient(
-                                                      colors: [
-                                                        // #E25FB2
-                                                        Color(0xFF7E6DF1),
-                                                        Color(
-                                                            0xFF7E6DF1), // #7E6DF1
-                                                        Color(0xFFE25FB2),
-                                                      ],
-                                                    ).createShader(
-                                                      // Adjust these coordinates as needed for the best gradient placement
-                                                      const Rect.fromLTWH(0.0,
-                                                          0.0, 300.0, 70.0),
-                                                    )
-                                                    ..style = PaintingStyle
-                                                        .stroke // Outline style
-                                                    ..strokeWidth =
-                                                        2, // Outline thickness
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                  text: 'Choose Your Persona',
-                                                  style:
-                                                      GoogleFonts.leagueSpartan(
-                                                          fontSize: 25.sp,
-                                                          fontWeight:
-                                                              FontWeight.w300,
-                                                          color: Colors
-                                                              .grey.shade500)),
-                                            ])),
+                                              fontWeight: FontWeight.w900,
+                                              foreground: Paint()
+                                                ..shader = const LinearGradient(
+                                                  colors: [
+                                                    // #E25FB2
+                                                    Color(0xFF7E6DF1),
+                                                    Color(0xFF7E6DF1), // #7E6DF1
+                                                    Color(0xFFE25FB2),
+                                                  ],
+                                                ).createShader(
+                                                  // Adjust these coordinates as needed for the best gradient placement
+                                                  const Rect.fromLTWH(0.0, 0.0, 300.0, 70.0),
+                                                )
+                                                ..style = PaintingStyle.stroke // Outline style
+                                                ..strokeWidth = 2, // Outline thickness
+                                            ),
+                                          ),
+                                          TextSpan(text: 'Choose Your Persona', style: GoogleFonts.leagueSpartan(fontSize: 25.sp, fontWeight: FontWeight.w300, color: Colors.grey.shade500)),
+                                        ])),
                                   ),
                                 );
                               },
-                              firstPageErrorIndicatorBuilder: (context) =>
-                                  Center(
+                              firstPageErrorIndicatorBuilder: (context) => Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Text('Error loading messages',
-                                        style: TextStyle(color: Colors.white)),
+                                    const Text('Error loading messages', style: TextStyle(color: Colors.white)),
                                     ElevatedButton(
-                                      onPressed: () =>
-                                          _pagingController.refresh(),
+                                      onPressed: () => _pagingController.refresh(),
                                       child: const Text('Retry'),
                                     ),
                                   ],
@@ -1044,16 +909,14 @@ class _BondChatScreenState extends State<BondChatScreen> {
                                 hintText: 'Type your message...',
                                 hintStyle: TextStyle(color: Colors.grey),
                                 border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 15),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                               ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 8),
                         IconButton(
-                          icon: Icon(_isListening ? Icons.mic : Icons.mic_none,
-                              color: const Color(0xFF7400A5)),
+                          icon: Icon(_isListening ? Icons.mic : Icons.mic_none, color: const Color(0xFF7400A5)),
                           onPressed: () {
                             _isListening ? _stopListening() : _startListening();
                           },

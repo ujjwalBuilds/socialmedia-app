@@ -26,8 +26,7 @@ import 'package:socialmedia/services/message.dart';
 import 'package:socialmedia/users/searched_userprofile.dart';
 import 'package:socialmedia/utils/colors.dart';
 import 'package:socialmedia/utils/constants.dart';
-import 'package:socialmedia/utils/reaction_constants.dart'
-    show ReactionConstants;
+import 'package:socialmedia/utils/reaction_constants.dart' show ReactionConstants;
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:socialmedia/bottom_nav_bar/activity/group/editgroupscreen.dart';
 import 'package:intl/intl.dart';
@@ -52,8 +51,7 @@ class DChatScreen extends StatefulWidget {
 class DChatScreenState extends State<DChatScreen> {
   final TextEditingController _controller = TextEditingController();
   static const _pageSize = 20;
-  final PagingController<int, Message> _pagingController =
-      PagingController(firstPageKey: 1);
+  final PagingController<int, Message> _pagingController = PagingController(firstPageKey: 1);
   String? userid;
   late IO.Socket _socket;
   final SocketService _socketService = SocketService();
@@ -72,11 +70,9 @@ class DChatScreenState extends State<DChatScreen> {
   @override
   void initState() {
     super.initState();
-    print(
-        '🚀 Initializing DChatScreen for chatRoomId: ${widget.chatRoom.chatRoomId}');
+    print('🚀 Initializing DChatScreen for chatRoomId: ${widget.chatRoom.chatRoomId}');
     print('📱 Room type: ${widget.chatRoom.roomType}');
-    print(
-        '👥 Initial participants count: ${widget.chatRoom.participants.length}');
+    print('👥 Initial participants count: ${widget.chatRoom.participants.length}');
 
     // Initialize userProvider first
     userProvider = Provider.of<UserProviderall>(context, listen: false);
@@ -187,8 +183,7 @@ class DChatScreenState extends State<DChatScreen> {
 
           print('Parsed message keys: ${messageMap.keys.toList()}');
           final newMessage = Message.fromJson(messageMap);
-          final userProvider =
-              Provider.of<UserProviderall>(context, listen: false);
+          final userProvider = Provider.of<UserProviderall>(context, listen: false);
           final currentUserId = userProvider.userId;
           // Only insert into the UI if the message is not from the current user.
           if (newMessage.senderId != currentUserId) {
@@ -218,8 +213,7 @@ class DChatScreenState extends State<DChatScreen> {
   Future<List<String>> fetchRandomText() async {
     //print(widget.chatRoom.participants.first.)
     final userProvider = Provider.of<UserProviderall>(context, listen: false);
-    String url =
-        '${BASE_URL}api/getRandomText?other=${widget.chatRoom.participants.first.userId}';
+    String url = '${BASE_URL}api/getRandomText?other=${widget.chatRoom.participants.first.userId}';
 
     final response = await http.get(
       Uri.parse(url),
@@ -236,10 +230,7 @@ class DChatScreenState extends State<DChatScreen> {
       // Splitting the text into individual messages
       List<String> messages = topicText.split('\n').map((msg) {
         // Remove leading numbers (e.g., "1. ") and quotation marks
-        return msg
-            .replaceAll(RegExp(r'^\d+\.\s*'), '')
-            .replaceAll('"', '')
-            .trim();
+        return msg.replaceAll(RegExp(r'^\d+\.\s*'), '').replaceAll('"', '').trim();
       }).toList();
 
       return messages;
@@ -265,7 +256,10 @@ class DChatScreenState extends State<DChatScreen> {
           'token': token,
           'Content-Type': 'application/json',
         },
-        body: json.encode({"entityId": id, "reactionType": "seen"}),
+        body: json.encode({
+          "entityId": id,
+          "reactionType": "seen"
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -280,8 +274,7 @@ class DChatScreenState extends State<DChatScreen> {
 
   Future<void> initSocket() async {
     final prefs = await SharedPreferences.getInstance();
-    String? userId =
-        prefs.getString('user_id'); // Fetch user ID from SharedPreferences
+    String? userId = prefs.getString('user_id'); // Fetch user ID from SharedPreferences
     print('yelelelelelelellee $userId');
 
     if (userId == null) {
@@ -290,7 +283,9 @@ class DChatScreenState extends State<DChatScreen> {
     }
 
     _socket = IO.io(BASE_URL, <String, dynamic>{
-      "transports": ["websocket"],
+      "transports": [
+        "websocket"
+      ],
       "autoConnect": false,
     });
 
@@ -344,9 +339,7 @@ class DChatScreenState extends State<DChatScreen> {
         final data = json.decode(response.body);
 
         // Extract and set agoTime for DM chats from the first message
-        if (widget.chatRoom.roomType == 'dm' &&
-            data['messages'] is List &&
-            data['messages'].isNotEmpty) {
+        if (widget.chatRoom.roomType == 'dm' && data['messages'] is List && data['messages'].isNotEmpty) {
           final firstMessage = data['messages'][0];
           final String agoTimeValue = firstMessage['agoTime'] ?? '';
 
@@ -358,9 +351,7 @@ class DChatScreenState extends State<DChatScreen> {
         }
 
         // Create messages from response
-        final List<Message> fetchedMessages = (data['messages'] as List)
-            .map((msg) => Message.fromJson(msg))
-            .toList();
+        final List<Message> fetchedMessages = (data['messages'] as List).map((msg) => Message.fromJson(msg)).toList();
 
         log('Fetched ${fetchedMessages.length} messages', name: 'Messages');
 
@@ -372,14 +363,12 @@ class DChatScreenState extends State<DChatScreen> {
 
         List<Message> updatedMessages = [];
         for (var message in fetchedMessages) {
-          log('Fetching reactions for message: ${message.id}',
-              name: 'MessagesReactions');
+          log('Fetching reactions for message: ${message.id}', name: 'MessagesReactions');
 
           // Fetch reactions for the message
           final reactions = await fetchMessageReactions(message.id);
 
-          log('Retrieved ${reactions.length} reactions for message: ${message.id}',
-              name: 'MessagesReactions');
+          log('Retrieved ${reactions.length} reactions for message: ${message.id}', name: 'MessagesReactions');
 
           // Create updated message with fetched reactions
           final updatedMessage = message.copyWith(reactions: reactions);
@@ -395,8 +384,7 @@ class DChatScreenState extends State<DChatScreen> {
           isnewconversation = false;
           isNewConversation = false;
           markMessageAsSeen(data['messages'][0]['_id']);
-          log('Marked message as seen: ${data['messages'][0]['_id']}',
-              name: 'Messages');
+          log('Marked message as seen: ${data['messages'][0]['_id']}', name: 'Messages');
         }
 
         setState(() {
@@ -407,23 +395,19 @@ class DChatScreenState extends State<DChatScreen> {
           setState(() {
             _isMessagesLoaded = true;
           });
-          log('First page loaded, _isMessagesLoaded set to true',
-              name: 'Messages');
+          log('First page loaded, _isMessagesLoaded set to true', name: 'Messages');
         }
 
         final isLastPage = updatedMessages.length < _pageSize;
         if (isLastPage) {
-          log('Appending last page, messages count: ${updatedMessages.length}',
-              name: 'Messages');
+          log('Appending last page, messages count: ${updatedMessages.length}', name: 'Messages');
           _pagingController.appendLastPage(updatedMessages);
         } else {
-          log('Appending page $pageKey, messages count: ${updatedMessages.length}',
-              name: 'Messages');
+          log('Appending page $pageKey, messages count: ${updatedMessages.length}', name: 'Messages');
           _pagingController.appendPage(updatedMessages, pageKey + 1);
         }
       } else {
-        log('Failed to load messages: ${response.statusCode}',
-            name: 'Messages');
+        log('Failed to load messages: ${response.statusCode}', name: 'Messages');
         _pagingController.error = 'Failed to load messages';
       }
     } catch (error) {
@@ -515,9 +499,7 @@ class DChatScreenState extends State<DChatScreen> {
             channel: channelName,
             token: token,
             callID: callId,
-            profile: widget.chatRoom.participants.first.profilePic == null
-                ? 'assets/avatar/3.png'
-                : widget.chatRoom.participants.first.profilePic!,
+            profile: widget.chatRoom.participants.first.profilePic == null ? 'assets/avatar/3.png' : widget.chatRoom.participants.first.profilePic!,
             name: widget.chatRoom.participants.first.name!,
           ),
         ),
@@ -526,15 +508,7 @@ class DChatScreenState extends State<DChatScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => AgoraVidCall(
-              channel: channelName,
-              token: token,
-              callerName: 'Video Call',
-              call_id: callId,
-              profile: widget.chatRoom.participants.first.profilePic == null
-                  ? 'assets/avatar/3.png'
-                  : widget.chatRoom.participants.first.profilePic!,
-              name: widget.chatRoom.participants.first.name!),
+          builder: (context) => AgoraVidCall(channel: channelName, token: token, callerName: 'Video Call', call_id: callId, profile: widget.chatRoom.participants.first.profilePic == null ? 'assets/avatar/3.png' : widget.chatRoom.participants.first.profilePic!, name: widget.chatRoom.participants.first.name!),
         ),
       );
     }
@@ -567,7 +541,12 @@ class DChatScreenState extends State<DChatScreen> {
       print('Call started: ${data['message']}');
 
       _socketService.initiateCall(
-          data['call']['_id'], userId, [toUserId], type);
+          data['call']['_id'],
+          userId,
+          [
+            toUserId
+          ],
+          type);
       _joinCall(data['call']['_id'], type, fromgrp);
 
       // if (type == 'audio') {
@@ -595,8 +574,7 @@ class DChatScreenState extends State<DChatScreen> {
     }
   }
 
-  void showAddFriendsSheet(BuildContext context,
-      Map<String, Participant> participantsMap, String type) {
+  void showAddFriendsSheet(BuildContext context, Map<String, Participant> participantsMap, String type) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -622,9 +600,7 @@ class DChatScreenState extends State<DChatScreen> {
   }
 
   String truncateName(String name, {int maxLength = 10}) {
-    return name.length > maxLength
-        ? '${name.substring(0, maxLength)}...'
-        : name;
+    return name.length > maxLength ? '${name.substring(0, maxLength)}...' : name;
   }
 
   Future<void> refreshGroupDetails() async {
@@ -632,8 +608,7 @@ class DChatScreenState extends State<DChatScreen> {
       final userProvider = Provider.of<UserProviderall>(context, listen: false);
 
       final response = await http.get(
-        Uri.parse(
-            '${BASE_URL}api/get-chatroom-details?chatRoomId=${widget.chatRoom.chatRoomId}'),
+        Uri.parse('${BASE_URL}api/get-chatroom-details?chatRoomId=${widget.chatRoom.chatRoomId}'),
         headers: {
           'UserId': userProvider.userId!,
           'token': userProvider.userToken!,
@@ -654,28 +629,10 @@ class DChatScreenState extends State<DChatScreen> {
         // print('👀 Unseen count: ${chatRoomData['unseenCount']}');
 
         setState(() {
-          widget.chatRoom = ChatRoom(
-              id: chatRoomData['_id'],
-              chatRoomId: chatRoomData['chatRoomId'],
-              participants: (chatRoomData['participants'] as List)
-                  .map((p) => Participant.fromJson(p))
-                  .toList(),
-              roomType: chatRoomData['roomType'],
-              groupName: chatRoomData['groupName'],
-              profileUrl: chatRoomData['profileUrl'],
-              admin: chatRoomData['admin'],
-              lastmessage: chatRoomData['lastMessage'] != null
-                  ? Lastmessage.fromJson(chatRoomData['lastMessage'])
-                  : null,
-              createdAt: DateTime.parse(chatRoomData['createdAt']),
-              updatedAt: DateTime.parse(chatRoomData['updatedAt']),
-              isPart: chatRoomData['isPart'],
-              lastseencount: chatRoomData['unseenCount'],
-              groupProfile: chatRoomData['profileUrl']);
+          widget.chatRoom = ChatRoom(id: chatRoomData['_id'], chatRoomId: chatRoomData['chatRoomId'], participants: (chatRoomData['participants'] as List).map((p) => Participant.fromJson(p)).toList(), roomType: chatRoomData['roomType'], groupName: chatRoomData['groupName'], profileUrl: chatRoomData['profileUrl'], admin: chatRoomData['admin'], lastmessage: chatRoomData['lastMessage'] != null ? Lastmessage.fromJson(chatRoomData['lastMessage']) : null, createdAt: DateTime.parse(chatRoomData['createdAt']), updatedAt: DateTime.parse(chatRoomData['updatedAt']), isPart: chatRoomData['isPart'], lastseencount: chatRoomData['unseenCount'], groupProfile: chatRoomData['profileUrl']);
         });
       } else {
-        print(
-            '❌ Failed to refresh group details. Status code: ${response.statusCode}');
+        print('❌ Failed to refresh group details. Status code: ${response.statusCode}');
       }
     } catch (error) {
       print('❌ Error refreshing group details: $error');
@@ -703,13 +660,10 @@ class DChatScreenState extends State<DChatScreen> {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom +
-              100, // Add extra padding
+          bottom: MediaQuery.of(context).viewInsets.bottom + 100, // Add extra padding
         ),
         decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.grey[900]
-              : Colors.white,
+          color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[900] : Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
@@ -734,14 +688,7 @@ class DChatScreenState extends State<DChatScreen> {
 
     try {
       // Create the message with reply information and current time
-      final replyMessage = Message(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          content: _controller.text,
-          senderId: userid!,
-          timestamp: DateTime.now(),
-          replyToMessageId: _replyingToMessage!.id,
-          replyToMessage: _replyingToMessage,
-          time: DateFormat('HH:mm').format(DateTime.now())); // Add current time
+      final replyMessage = Message(id: DateTime.now().millisecondsSinceEpoch.toString(), content: _controller.text, senderId: userid!, timestamp: DateTime.now(), replyToMessageId: _replyingToMessage!.id, replyToMessage: _replyingToMessage, time: DateFormat('HH:mm').format(DateTime.now())); // Add current time
 
       // Send via socket with time parameter
       _socketService.sendReplyMessage(
@@ -809,8 +756,7 @@ class DChatScreenState extends State<DChatScreen> {
           print('   Message: ${message.id}');
           print('   Replying to: ${replyToMessage.id}');
           print('   Reply content: ${replyToMessage.content}');
-          _allMessagesById[message.id] =
-              message.copyWith(replyToMessage: replyToMessage);
+          _allMessagesById[message.id] = message.copyWith(replyToMessage: replyToMessage);
         }
       }
     }
@@ -904,8 +850,7 @@ class DChatScreenState extends State<DChatScreen> {
                   media: data['media'],
                   id: data['_id'] ?? data['id'] ?? newMessage.id,
                 );
-                final index = _pagingController.itemList!
-                    .indexWhere((msg) => msg.id == newMessage.id);
+                final index = _pagingController.itemList!.indexWhere((msg) => msg.id == newMessage.id);
                 if (index != -1) {
                   _pagingController.itemList![index] = updatedMessage;
                 }
@@ -985,7 +930,10 @@ class DChatScreenState extends State<DChatScreen> {
           'token': token,
           'Content-Type': 'application/json',
         },
-        body: json.encode({"entityId": messageId, "entityType": "message"}),
+        body: json.encode({
+          "entityId": messageId,
+          "entityType": "message"
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -993,9 +941,7 @@ class DChatScreenState extends State<DChatScreen> {
         print('Reactions API Response: ${response.body}');
 
         if (data['reactions'] != null) {
-          return (data['reactions'] as List)
-              .map((reaction) => Reaction.fromJson(reaction))
-              .toList();
+          return (data['reactions'] as List).map((reaction) => Reaction.fromJson(reaction)).toList();
         }
       } else {
         print('Failed to fetch reactions: ${response.body}');
@@ -1013,16 +959,14 @@ class DChatScreenState extends State<DChatScreen> {
 
       // Update the message in the UI immediately
       setState(() {
-        final messageIndex = _pagingController.itemList
-            ?.indexWhere((msg) => msg.id == messageId);
+        final messageIndex = _pagingController.itemList?.indexWhere((msg) => msg.id == messageId);
 
         if (messageIndex != null && messageIndex != -1) {
           final currentMessage = _pagingController.itemList![messageIndex];
           final currentReactions = currentMessage.reactions ?? [];
 
           // Check if user already reacted
-          final existingReactionIndex = currentReactions
-              .indexWhere((r) => r.users.any((u) => u.userId == userid));
+          final existingReactionIndex = currentReactions.indexWhere((r) => r.users.any((u) => u.userId == userid));
 
           List<Reaction> updatedReactions;
           if (existingReactionIndex != -1) {
@@ -1030,8 +974,7 @@ class DChatScreenState extends State<DChatScreen> {
             final existingReaction = currentReactions[existingReactionIndex];
             if (existingReaction.type == reactionType) {
               // Remove reaction if same type is selected again
-              updatedReactions = List.from(currentReactions)
-                ..removeAt(existingReactionIndex);
+              updatedReactions = List.from(currentReactions)..removeAt(existingReactionIndex);
             } else {
               // Update reaction type
               updatedReactions = List.from(currentReactions)
@@ -1045,7 +988,9 @@ class DChatScreenState extends State<DChatScreen> {
               ..add(Reaction(
                 type: reactionType,
                 count: 1,
-                users: [ReactionUser(userId: userid!)],
+                users: [
+                  ReactionUser(userId: userid!)
+                ],
               ));
           }
 
@@ -1062,12 +1007,10 @@ class DChatScreenState extends State<DChatScreen> {
 
       // Update the message with server data
       setState(() {
-        final messageIndex = _pagingController.itemList
-            ?.indexWhere((msg) => msg.id == messageId);
+        final messageIndex = _pagingController.itemList?.indexWhere((msg) => msg.id == messageId);
 
         if (messageIndex != null && messageIndex != -1) {
-          final updatedMessage =
-              _pagingController.itemList![messageIndex].copyWith(
+          final updatedMessage = _pagingController.itemList![messageIndex].copyWith(
             reactions: updatedReactions,
           );
           _pagingController.itemList![messageIndex] = updatedMessage;
@@ -1086,14 +1029,10 @@ class DChatScreenState extends State<DChatScreen> {
 
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? AppColors.lightText
-            : AppColors.darkText,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark ? AppColors.lightText : AppColors.darkText,
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: Theme.of(context).brightness == Brightness.dark
-              ? AppColors.lightText
-              : AppColors.darkText,
+          backgroundColor: Theme.of(context).brightness == Brightness.dark ? AppColors.lightText : AppColors.darkText,
           title: FittedBox(
             child: GestureDetector(
               onTap: () {
@@ -1116,10 +1055,7 @@ class DChatScreenState extends State<DChatScreen> {
                 children: [
                   IconButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => BottomNavBarScreen()));
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BottomNavBarScreen()));
                       },
                       icon: Icon(Icons.arrow_back_ios)),
                   InkWell(
@@ -1127,60 +1063,45 @@ class DChatScreenState extends State<DChatScreen> {
                       print(widget.chatRoom.participants.first.name);
                     },
                     child: GestureDetector(
-                        onTap: () {
-                          if (widget.chatRoom.roomType == 'group') {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => EditGroupScreen(
-                                        chatRoomId: widget.chatRoom.chatRoomId,
-                                        onGroupUpdated: forceRefresh)));
-                          }
-                        },
-                        child: CircleAvatar(
-                          backgroundColor: Color(0xFF7400A5),
-                          backgroundImage: widget.chatRoom.roomType == 'dm'
-                              ? widget.chatRoom.participants.first.profilePic !=
-                                      null
-                                  ? NetworkImage(widget
-                                      .chatRoom.participants.first.profilePic!)
-                                  : const AssetImage(
-                                      'assets/images/profile.png')
-                              : widget.chatRoom.groupProfile != null
-                                  ? NetworkImage(widget.chatRoom.groupProfile!)
-                                  : null,
-                          child: widget.chatRoom.roomType != 'dm' &&
-                                  widget.chatRoom.groupProfile == null
-                              ? Padding(
-                                  padding: const EdgeInsets.all(6.0),
-                                  child: SvgPicture.asset(
-                                    'assets/icons/group.svg',
-                                    width: 32,
-                                    height: 32,
-                                    fit: BoxFit.contain,
-                                  ),
-                                )
-                              : null,
-                        ),
-                        ),
+                      onTap: () {
+                        if (widget.chatRoom.roomType == 'group') {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => EditGroupScreen(chatRoomId: widget.chatRoom.chatRoomId, onGroupUpdated: forceRefresh)));
+                        }
+                      },
+                      child: CircleAvatar(
+                        backgroundColor: Color(0xFF7400A5),
+                        backgroundImage: widget.chatRoom.roomType == 'dm'
+                            ? widget.chatRoom.participants.first.profilePic != null
+                                ? NetworkImage(widget.chatRoom.participants.first.profilePic!)
+                                : const AssetImage('assets/images/profile.png')
+                            : widget.chatRoom.groupProfile != null
+                                ? NetworkImage(widget.chatRoom.groupProfile!)
+                                : null,
+                        child: widget.chatRoom.roomType != 'dm' && widget.chatRoom.groupProfile == null
+                            ? Padding(
+                                padding: const EdgeInsets.all(6.0),
+                                child: SvgPicture.asset(
+                                  'assets/icons/group.svg',
+                                  width: 32,
+                                  height: 32,
+                                  fit: BoxFit.contain,
+                                ),
+                              )
+                            : null,
+                      ),
+                    ),
                   ),
                   SizedBox(width: 6.w),
                   if (widget.chatRoom.roomType == 'dm')
                     InkWell(
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => UserProfileScreen(
-                                    userId: widget
-                                        .chatRoom.participants.first.userId)));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => UserProfileScreen(userId: widget.chatRoom.participants.first.userId)));
                       },
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            truncateName(
-                                widget.chatRoom.participants.first.name ?? ""),
+                            truncateName(widget.chatRoom.participants.first.name ?? ""),
                             style: GoogleFonts.roboto(
                               fontSize: 20.sp,
                               fontWeight: FontWeight.w600,
@@ -1204,18 +1125,11 @@ class DChatScreenState extends State<DChatScreen> {
                       children: [
                         Text(
                           truncateName(widget.chatRoom.groupName!),
-                          style: TextStyle(
-                              fontSize: 28.sp,
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black),
+                          style: TextStyle(fontSize: 28.sp, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
                         ),
                         Text(
                           'Group',
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              color: const Color.fromARGB(255, 185, 184, 184)),
+                          style: TextStyle(fontSize: 12.sp, color: const Color.fromARGB(255, 185, 184, 184)),
                         ),
                       ],
                     ),
@@ -1224,9 +1138,7 @@ class DChatScreenState extends State<DChatScreen> {
             ),
           ),
           iconTheme: IconThemeData(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? AppColors.darkText
-                : AppColors.lightText,
+            color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText,
           ),
           actions: [
             // if (widget.chatRoom.roomType == 'group')
@@ -1284,21 +1196,17 @@ class DChatScreenState extends State<DChatScreen> {
                 child: PagedListView<int, Message>(
                   pagingController: _pagingController,
                   reverse: true,
-                  builderDelegate: PagedChildBuilderDelegate<Message>(
-                      itemBuilder: (context, message, index) {
+                  builderDelegate: PagedChildBuilderDelegate<Message>(itemBuilder: (context, message, index) {
                     final isSender = message.senderId == userid;
                     // Find the replied message if this message is a reply
                     Message? repliedMessage;
                     if (message.replyToMessageId != null) {
-                      repliedMessage =
-                          _findMessageById(message.replyToMessageId!);
+                      repliedMessage = _findMessageById(message.replyToMessageId!);
                       print(' Processing message ${message.id}:');
-                      print(
-                          '  ↪️ Is Reply: ${message.replyToMessageId != null}');
+                      print('  ↪️ Is Reply: ${message.replyToMessageId != null}');
                       print('  📝 Content: ${message.content}');
                       print('  🔍 Reply To ID: ${message.replyToMessageId}');
-                      print(
-                          '  📨 Found Reply Message: ${repliedMessage != null}');
+                      print('  📨 Found Reply Message: ${repliedMessage != null}');
                       if (repliedMessage != null) {
                         print('  💬 Reply Content: ${repliedMessage.content}');
                       }
@@ -1308,11 +1216,9 @@ class DChatScreenState extends State<DChatScreen> {
                       builder: (context) => InkWell(
                         onLongPress: () {
                           // Get the position of the message bubble
-                          final RenderBox? renderBox =
-                              context.findRenderObject() as RenderBox?;
+                          final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
                           if (renderBox != null) {
-                            final position =
-                                renderBox.localToGlobal(Offset.zero);
+                            final position = renderBox.localToGlobal(Offset.zero);
                             final size = renderBox.size;
 
                             showDialog(
@@ -1320,8 +1226,7 @@ class DChatScreenState extends State<DChatScreen> {
                               barrierColor: Colors.transparent,
                               builder: (context) => ReactionPopupModal(
                                 onReactionSelected: (reactionType) {
-                                  _updateMessageReaction(
-                                      message.id, reactionType);
+                                  _updateMessageReaction(message.id, reactionType);
                                 },
                                 currentReaction: message.currentUserReaction,
                                 isSender: isSender,
@@ -1332,8 +1237,7 @@ class DChatScreenState extends State<DChatScreen> {
                           }
                         },
                         child: MessageBubble(
-                          message:
-                              message.copyWith(replyToMessage: repliedMessage),
+                          message: message.copyWith(replyToMessage: repliedMessage),
                           isSender: isSender,
                           participantsMap: participantsMap,
                           currentUserId: userid!,
@@ -1359,8 +1263,7 @@ class DChatScreenState extends State<DChatScreen> {
                   }),
                 ),
               ),
-              if (widget.chatRoom.roomType == 'group' &&
-                  !widget.chatRoom.isPart)
+              if (widget.chatRoom.roomType == 'group' && !widget.chatRoom.isPart)
                 Container(
                   padding: EdgeInsets.all(8),
                   color: Colors.red.withOpacity(0.1),
@@ -1378,9 +1281,7 @@ class DChatScreenState extends State<DChatScreen> {
                 Container(
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey[800]
-                        : Colors.grey[200],
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
                     border: Border(
                       top: BorderSide(
                         color: Colors.grey.shade400,
@@ -1432,11 +1333,9 @@ class DChatScreenState extends State<DChatScreen> {
                         ? FutureBuilder<List<String>>(
                             future: _randomTextFuture,
                             builder: (context, snapshot) {
-                              if (!isNewConversation)
-                                return const SizedBox.shrink();
+                              if (!isNewConversation) return const SizedBox.shrink();
 
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
                                 return SizedBox(
                                   height: 80,
                                   child: Shimmer.fromColors(
@@ -1447,15 +1346,13 @@ class DChatScreenState extends State<DChatScreen> {
                                       itemCount: 3,
                                       itemBuilder: (context, index) {
                                         return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 8.0),
+                                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                           child: Container(
                                             width: 250,
                                             padding: const EdgeInsets.all(12),
                                             decoration: BoxDecoration(
                                               color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
+                                              borderRadius: BorderRadius.circular(10),
                                             ),
                                           ),
                                         );
@@ -1466,34 +1363,26 @@ class DChatScreenState extends State<DChatScreen> {
                               } else if (snapshot.hasError) {
                                 return SizedBox(
                                   height: 80,
-                                  child: Center(
-                                      child: Text('Error: ${snapshot.error}')),
+                                  child: Center(child: Text('Error: ${snapshot.error}')),
                                 );
                               } else {
-                                final List<String> suggestions =
-                                    snapshot.data ?? [];
+                                final List<String> suggestions = snapshot.data ?? [];
                                 if (suggestions.isEmpty) {
                                   return const SizedBox.shrink();
                                 }
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 8),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10.0, vertical: 4.0),
+                                        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
                                         child: Text(
-                                          'BondChat Suggestions',
+                                          'ancoChat Suggestions',
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
-                                            color:
-                                                Theme.of(context).brightness ==
-                                                        Brightness.dark
-                                                    ? AppColors.darkText
-                                                    : AppColors.lightText,
+                                            color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText,
                                           ),
                                         ),
                                       ),
@@ -1504,39 +1393,27 @@ class DChatScreenState extends State<DChatScreen> {
                                           itemCount: suggestions.length,
                                           itemBuilder: (context, index) {
                                             return Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 8.0),
+                                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                               child: GestureDetector(
-                                                onTap: () => _copyAndPasteText(
-                                                    suggestions[index]),
+                                                onTap: () => _copyAndPasteText(suggestions[index]),
                                                 child: Container(
                                                   width: 250,
-                                                  padding:
-                                                      const EdgeInsets.all(12),
+                                                  padding: const EdgeInsets.all(12),
                                                   decoration: BoxDecoration(
-                                                    color:
-                                                        const Color(0xFF7400A5),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
+                                                    color: const Color(0xFF7400A5),
+                                                    borderRadius: BorderRadius.circular(10),
                                                   ),
                                                   child: Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
-                                                      const Icon(Icons.message,
-                                                          color: Colors.white),
+                                                      const Icon(Icons.message, color: Colors.white),
                                                       const SizedBox(width: 8),
                                                       Expanded(
                                                         child: Text(
                                                           suggestions[index],
                                                           maxLines: 3,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style:
-                                                              const TextStyle(
+                                                          overflow: TextOverflow.ellipsis,
+                                                          style: const TextStyle(
                                                             color: Colors.white,
                                                             fontSize: 16,
                                                           ),
@@ -1569,10 +1446,7 @@ class DChatScreenState extends State<DChatScreen> {
                             padding: const EdgeInsets.all(8.0),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.grey[900]
-                                    : Colors.grey[200],
+                                color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[900] : Colors.grey[200],
                                 borderRadius: BorderRadius.circular(25),
                               ),
                               child: Padding(
@@ -1581,26 +1455,13 @@ class DChatScreenState extends State<DChatScreen> {
                                 ),
                                 child: TextField(
                                   controller: _controller,
-                                  enabled:
-                                      widget.chatRoom.roomType != 'group' ||
-                                          widget.chatRoom.isPart,
+                                  enabled: widget.chatRoom.roomType != 'group' || widget.chatRoom.isPart,
                                   style: TextStyle(
-                                    color: Theme.of(context).brightness ==
-                                            Brightness.dark
-                                        ? AppColors.darkText
-                                        : AppColors.lightText,
+                                    color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText,
                                   ),
                                   decoration: InputDecoration(
-                                    hintText:
-                                        widget.chatRoom.roomType == 'group' &&
-                                                !widget.chatRoom.isPart
-                                            ? 'You have left this group'
-                                            : 'Type A Message...',
-                                    hintStyle: GoogleFonts.poppins(
-                                        color: Theme.of(context).brightness ==
-                                                Brightness.dark
-                                            ? Colors.white60
-                                            : AppColors.lightText),
+                                    hintText: widget.chatRoom.roomType == 'group' && !widget.chatRoom.isPart ? 'You have left this group' : 'Type A Message...',
+                                    hintStyle: GoogleFonts.poppins(color: Theme.of(context).brightness == Brightness.dark ? Colors.white60 : AppColors.lightText),
                                     border: InputBorder.none,
                                   ),
                                 ),
@@ -1609,8 +1470,7 @@ class DChatScreenState extends State<DChatScreen> {
                           ),
                         ),
                         SizedBox(width: 8),
-                        if (widget.chatRoom.roomType != 'group' ||
-                            widget.chatRoom.isPart)
+                        if (widget.chatRoom.roomType != 'group' || widget.chatRoom.isPart)
                           Container(
                             decoration: BoxDecoration(
                               color: const Color(0xFF7400A5),
@@ -1726,9 +1586,7 @@ class ReactionPopupModal extends StatelessWidget {
               width: popupWidth,
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[900]
-                    : Colors.white,
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[900] : Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
@@ -1741,10 +1599,8 @@ class ReactionPopupModal extends StatelessWidget {
               child: Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: ReactionConstants.availableReactionTypes
-                    .map((reactionType) {
-                  final emoji =
-                      ReactionConstants.reactionTypeToEmoji[reactionType]!;
+                children: ReactionConstants.availableReactionTypes.map((reactionType) {
+                  final emoji = ReactionConstants.reactionTypeToEmoji[reactionType]!;
                   final isSelected = currentReaction == reactionType;
 
                   return GestureDetector(
@@ -1755,9 +1611,7 @@ class ReactionPopupModal extends StatelessWidget {
                     child: Container(
                       padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: isSelected
-                            ? Colors.purple.withOpacity(0.2)
-                            : Colors.transparent,
+                        color: isSelected ? Colors.purple.withOpacity(0.2) : Colors.transparent,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(

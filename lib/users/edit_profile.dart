@@ -39,8 +39,7 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _bioController =
-      TextEditingController(); // Renamed from _emailController for clarity
+  final TextEditingController _bioController = TextEditingController(); // Renamed from _emailController for clarity
   late UserProviderall userProvider;
   File? _customPhotoFile;
   String _currentAvatar = '';
@@ -71,7 +70,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _currentInterests = List.from(widget.selectedInterests);
   }
 
-  void _rewriteBioWithBondChat() async {
+  void _rewriteBioWithancoChat() async {
     if (_bioController.text.isEmpty) return;
 
     // Select all text
@@ -85,9 +84,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       // Make API Call
       final response = await http.post(
-        Uri.parse("${BASE_URL}api/reWriteWithBond"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"caption": _bioController.text}),
+        Uri.parse("${BASE_URL}api/reWriteWithanco"),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode({
+          "caption": _bioController.text
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -138,9 +141,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
 
-        if (responseData['result'] != null &&
-            responseData['result'] is List &&
-            responseData['result'].isNotEmpty) {
+        if (responseData['result'] != null && responseData['result'] is List && responseData['result'].isNotEmpty) {
           final userDetails = responseData['result'][0];
 
           // Update the controllers with fetched data
@@ -154,8 +155,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             try {
               if (userDetails['interests'] is String) {
                 // If interests is a JSON string
-                _currentInterests =
-                    List<String>.from(jsonDecode(userDetails['interests']));
+                _currentInterests = List<String>.from(jsonDecode(userDetails['interests']));
               } else if (userDetails['interests'] is List) {
                 // If interests is already a List
                 _currentInterests = List<String>.from(userDetails['interests']);
@@ -205,8 +205,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     if (formData.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Center(child: Text("Fill at least one field to update"))),
+        const SnackBar(content: Center(child: Text("Fill at least one field to update"))),
       );
       return;
     }
@@ -263,8 +262,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Center(child: Text("Failed to update profile"))),
+          const SnackBar(content: Center(child: Text("Failed to update profile"))),
         );
       }
     } catch (e) {
@@ -285,10 +283,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final String username = _usernameController.text;
     final String bio = _bioController.text;
 
-    final result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => AvatarSelectionScreenforsetting()));
+    final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => AvatarSelectionScreenforsetting()));
 
     if (result != null && result is String) {
       setState(() {
@@ -308,10 +303,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final String username = _usernameController.text;
     final String bio = _bioController.text;
 
-    final result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => Interestsforsetting(avatar: widget.avatar)));
+    final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => Interestsforsetting(avatar: widget.avatar)));
 
     if (result != null && result is List<String>) {
       setState(() {
@@ -329,19 +321,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? AppColors
-                .darkGradient.first // Use first color in the gradient list
+            ? AppColors.darkGradient.first // Use first color in the gradient list
             : AppColors.lightGradient.first,
         appBar: AppBar(
-          backgroundColor: Theme.of(context).brightness == Brightness.dark
-              ? Colors.black
-              : Colors.white,
+          backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
           elevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : Colors.black),
+            icon: Icon(Icons.arrow_back, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
             onPressed: () => Navigator.pop(context),
           ),
           actions: [
@@ -357,11 +343,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 child: Text(
                   "Cancel",
-                  style: GoogleFonts.roboto(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : Colors.black,
-                      fontSize: 14),
+                  style: GoogleFonts.roboto(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, fontSize: 14),
                 ),
               ),
             ),
@@ -373,7 +355,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: Theme.of(context).brightness == Brightness.dark
-                  ? [Colors.black , Colors.black]
+                  ? [
+                      Colors.black,
+                      Colors.black
+                    ]
                   : AppColors.lightGradient,
             ),
           ),
@@ -391,10 +376,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           style: GoogleFonts.roboto(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? AppColors.darkText
-                                    : AppColors.lightText,
+                            color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText,
                           ),
                         ),
                         SizedBox(height: 8.h),
@@ -410,11 +392,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         SizedBox(height: 16.h),
                         _buildTextField("Bio", _bioController),
                         SizedBox(height: 16.h),
-                        _buildButton(
-                            'Choose Avatar', _selectAvatar, _currentAvatar),
+                        _buildButton('Choose Avatar', _selectAvatar, _currentAvatar),
                         SizedBox(height: 16.h),
-                        _buildButtonForInterest('Choose Interests',
-                            _selectInterests, _currentInterests),
+                        _buildButtonForInterest('Choose Interests', _selectInterests, _currentInterests),
                         SizedBox(height: 20.h),
                         Padding(
                           padding: EdgeInsets.only(bottom: 40.h),
@@ -426,20 +406,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30),
                                 ),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 100, vertical: 16),
+                                padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 16),
                               ),
                               child: _isLoading
-                                  ? const CircularProgressIndicator(
-                                      color: Colors.black)
+                                  ? const CircularProgressIndicator(color: Colors.black)
                                   : Text(
                                       "Save",
                                       style: GoogleFonts.roboto(
                                         fontSize: 16,
-                                        color: Theme.of(context).brightness ==
-                                                Brightness.dark
-                                            ? Colors.white
-                                            : Colors.white,
+                                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.white,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -459,8 +434,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildTextField(String hint, TextEditingController controller,
-      {IconData? icon}) {
+  Widget _buildTextField(String hint, TextEditingController controller, {IconData? icon}) {
     bool isBio = hint.toLowerCase() == "bio";
 
     return Column(
@@ -468,10 +442,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       children: [
         TextField(
           controller: controller,
-          style: GoogleFonts.roboto(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white
-                  : Colors.black),
+          style: GoogleFonts.roboto(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
           maxLines: isBio ? 5 : 1, // Multiple lines for bio
           maxLength: isBio ? 150 : null, // Character limit for bio
           keyboardType: isBio ? TextInputType.multiline : TextInputType.text,
@@ -489,9 +460,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             hintText: hint,
             hintStyle: GoogleFonts.roboto(color: Colors.grey),
             filled: true,
-            fillColor: Theme.of(context).brightness == Brightness.dark
-                ? Colors.black
-                : Colors.white,
+            fillColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
             counterText: isBio ? "" : null, // Hide default counter for bio
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20.sp),
@@ -506,14 +475,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               GestureDetector(
-                onTap: _isRewritingBio ? null : _rewriteBioWithBondChat,
+                onTap: _isRewritingBio ? null : _rewriteBioWithancoChat,
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(54.r),
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Color(0xFF1E1E1E)
-                        : Colors.grey[100],
+                    color: Theme.of(context).brightness == Brightness.dark ? Color(0xFF1E1E1E) : Colors.grey[100],
                     border: Border.all(color: Color(0xFF7400A5)),
                   ),
                   child: Row(
@@ -534,10 +501,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               style: GoogleFonts.roboto(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w400,
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
+                                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                               ),
                             ),
                       ShaderMask(
@@ -555,7 +519,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           Rect.fromLTWH(0, 0, bounds.width, bounds.height),
                         ),
                         child: Text(
-                          'BondChat',
+                          'ancoChat',
                           style: GoogleFonts.roboto(
                             fontSize: 16.sp,
                             fontWeight: FontWeight.bold,
@@ -565,7 +529,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       SizedBox(width: 5.w),
                       SvgPicture.asset(
-                        'assets/icons/bondchat_star.svg',
+                        'assets/icons/ancochat_star.svg',
                         width: 15.w,
                         height: 15.h,
                       )
@@ -613,9 +577,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       style: GoogleFonts.roboto(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.black,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                       ),
                     ),
                     SizedBox(height: 2.h),
@@ -635,7 +597,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ],
           ),
           SizedBox(height: 16.h),
-          
+
           // Large preview of selected image
           if (_currentAvatar.isNotEmpty || _customPhotoFile != null || _currentProfilePic.isNotEmpty)
             Center(
@@ -670,9 +632,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           Container(
             height: 45.h,
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.grey[800]
-                  : Colors.grey[200],
+              color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
               borderRadius: BorderRadius.circular(25.0),
             ),
             child: TabBar(
@@ -687,7 +647,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               labelPadding: EdgeInsets.zero,
               indicatorSize: TabBarIndicatorSize.tab,
               labelStyle: GoogleFonts.roboto(fontWeight: FontWeight.bold),
-              tabs: [Tab(text: "Avatar"), Tab(text: "Custom Photo")],
+              tabs: [
+                Tab(text: "Avatar"),
+                Tab(text: "Custom Photo")
+              ],
             ),
           ),
 
@@ -732,8 +695,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.add_a_photo, size: 60, color: Colors.grey),
-            Text("Upload Custom Photo",
-                style: TextStyle(color: Colors.grey)),
+            Text("Upload Custom Photo", style: TextStyle(color: Colors.grey)),
           ],
         ),
       ),
@@ -752,16 +714,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               leading: Icon(Icons.camera_alt),
               title: Text('Take Photo'),
               onTap: () async {
-                Navigator.pop(
-                    bc, await _picker.pickImage(source: ImageSource.camera));
+                Navigator.pop(bc, await _picker.pickImage(source: ImageSource.camera));
               },
             ),
             ListTile(
               leading: Icon(Icons.photo_library),
               title: Text('Choose From Gallery'),
               onTap: () async {
-                Navigator.pop(
-                    bc, await _picker.pickImage(source: ImageSource.gallery));
+                Navigator.pop(bc, await _picker.pickImage(source: ImageSource.gallery));
               },
             ),
           ],
@@ -828,8 +788,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  Future<void> uploadImage(
-      File imageFile, String userId, String token, String name) async {
+  Future<void> uploadImage(File imageFile, String userId, String token, String name) async {
     var uri = Uri.parse("${BASE_URL}api/edit-profile");
     final request = http.MultipartRequest('PUT', uri)
       ..headers.addAll({
@@ -884,9 +843,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                backgroundColor: Theme.of(context).brightness == Brightness.dark 
-                    ? Colors.black 
-                    : Colors.white,
+                backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16.0),
                   side: BorderSide(color: Color(0xFF7400A5), width: 1.0),
@@ -894,7 +851,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 title: Column(
                   children: [
                     SvgPicture.asset(
-                      'assets/images/bondlogog.svg',
+                      'assets/images/ancologog.svg',
                       width: 25.w,
                       height: 50.h,
                     ),
@@ -913,9 +870,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   'Are You Sure You Want To\nDelete Your Profile Picture?',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Theme.of(context).brightness == Brightness.dark 
-                        ? Colors.white 
-                        : Colors.black,
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                     fontSize: 14,
                   ),
                 ),
@@ -1012,8 +967,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         });
 
         // Update the UserProvider
-        final userProvider =
-            Provider.of<UserProviderall>(context, listen: false);
+        final userProvider = Provider.of<UserProviderall>(context, listen: false);
         userProvider.userProfile = '';
         await prefs.remove('user_profile');
 
@@ -1031,16 +985,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  Widget _buildButtonForInterest(
-      String text, VoidCallback onPressed, List<String> selectedInterests) {
+  Widget _buildButtonForInterest(String text, VoidCallback onPressed, List<String> selectedInterests) {
     return Column(
       children: [
         ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).brightness == Brightness.dark
-                ? Colors.black
-                : Colors.white,
+            backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20.sp),
               side: const BorderSide(color: Color(0xFF7400A5)),
@@ -1053,9 +1004,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               Text(
                 text,
                 style: GoogleFonts.roboto(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : Colors.black,
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w500,
                 ),
@@ -1075,8 +1024,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 runSpacing: 8,
                 children: selectedInterests.map((interest) {
                   return Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.black,
                       borderRadius: BorderRadius.circular(20.sp),
@@ -1100,8 +1048,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               selectedInterests.remove(interest);
                             });
                           },
-                          child: const Icon(Icons.close,
-                              color: Colors.deepPurpleAccent, size: 18),
+                          child: const Icon(Icons.close, color: Colors.deepPurpleAccent, size: 18),
                         ),
                       ],
                     ),

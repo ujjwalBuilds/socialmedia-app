@@ -1,4 +1,4 @@
-package com.bondbridge.bondbridgeonline
+package com.ancobridge.ancobridgeonline
 
 import io.flutter.embedding.android.FlutterActivity
 

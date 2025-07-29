@@ -641,9 +641,7 @@ class _ParticiapntgrpState extends State<Particiapntgrp> {
                           CircleAvatar(
                             radius: 35.sp,
                             backgroundColor: Color(0xFF7400A5),
-                            backgroundImage: groupImage.isNotEmpty 
-                                ? NetworkImage(groupImage) 
-                                : null,
+                            backgroundImage: groupImage.isNotEmpty ? NetworkImage(groupImage) : null,
                             child: groupImage.isEmpty
                                 ? Padding(
                                     padding: const EdgeInsets.all(6.0),
@@ -768,9 +766,7 @@ class _ParticiapntgrpState extends State<Particiapntgrp> {
                         return ListTile(
                           leading: CircleAvatar(
                             backgroundColor: Color(0xFF7400A5),
-                            backgroundImage: user["profilePic"] != null 
-                                ? NetworkImage(user["profilePic"]) 
-                                : null,
+                            backgroundImage: user["profilePic"] != null ? NetworkImage(user["profilePic"]) : null,
                             child: user["profilePic"] == null
                                 ? Padding(
                                     padding: const EdgeInsets.all(6.0),
@@ -1075,7 +1071,7 @@ class ThreeDotsMenuRemove extends StatelessWidget {
 
   Future<void> _removeParticipant(BuildContext context) async {
     try {
-      final url = Uri.parse('https://node-service-preprod.bondbridge.ai/api/remove-participant');
+      final url = Uri.parse('https://node-service-preprod.ancobridge.ai/api/remove-participant');
       final userProvider = Provider.of<UserProviderall>(context, listen: false);
       final String? token = userProvider.userToken;
       final headers = {

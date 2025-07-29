@@ -25,8 +25,7 @@ class MyStoryViewPage extends StatefulWidget {
   _MyStoryViewPageState createState() => _MyStoryViewPageState();
 }
 
-class _MyStoryViewPageState extends State<MyStoryViewPage>
-    with SingleTickerProviderStateMixin {
+class _MyStoryViewPageState extends State<MyStoryViewPage> with SingleTickerProviderStateMixin {
   final StoryController controller = StoryController();
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -104,14 +103,10 @@ class _MyStoryViewPageState extends State<MyStoryViewPage>
               loadingBuilder: (context, event) => Center(
                 child: CircularProgressIndicator(
                   color: Colors.white,
-                  value: event == null
-                      ? 0
-                      : event.cumulativeBytesLoaded /
-                          (event.expectedTotalBytes ?? 1),
+                  value: event == null ? 0 : event.cumulativeBytesLoaded / (event.expectedTotalBytes ?? 1),
                 ),
               ),
-              errorBuilder: (context, error, stackTrace) => Center(
-                  child: Icon(Icons.error, color: Colors.white, size: 48)),
+              errorBuilder: (context, error, stackTrace) => Center(child: Icon(Icons.error, color: Colors.white, size: 48)),
               tightMode: true,
             ),
           ),
@@ -232,9 +227,7 @@ class _MyStoryViewPageState extends State<MyStoryViewPage>
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         log(responseData.toString());
-        if (responseData['result'] != null &&
-            responseData['result'] is List &&
-            responseData['result'].isNotEmpty) {
+        if (responseData['result'] != null && responseData['result'] is List && responseData['result'].isNotEmpty) {
           final userDetails = responseData['result'][0];
           return userDetails['avatar']; // Return the profile picture URL
         }
@@ -303,14 +296,11 @@ class _MyStoryViewPageState extends State<MyStoryViewPage>
   Widget build(BuildContext context) {
     final userProfile = Provider.of<UserProviderall>(context).profilePic;
     final userName = Provider.of<UserProviderall>(context).userName;
-    if (!_isAnimationInitialized)
-      return Container(); // Return empty container while initializing
+    if (!_isAnimationInitialized) return Container(); // Return empty container while initializing
 
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? Colors.black
-            : Colors.black,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.black,
         body: Stack(
           children: [
             Container(
@@ -394,8 +384,7 @@ class _MyStoryViewPageState extends State<MyStoryViewPage>
                 onPressed: () => _showDeleteConfirmation(),
                 child: Text(
                   "Delete Story",
-                  style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600, color: Colors.white),
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: Colors.white),
                 ),
               ),
               IconButton(
@@ -415,9 +404,7 @@ class _MyStoryViewPageState extends State<MyStoryViewPage>
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Theme.of(context).brightness == Brightness.dark
-              ? Colors.black
-              : Colors.white,
+          backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
             side: BorderSide(color: Color(0xFF7400A5), width: 1.0),
@@ -425,7 +412,7 @@ class _MyStoryViewPageState extends State<MyStoryViewPage>
           title: Column(
             children: [
               SvgPicture.asset(
-                'assets/images/bondlogog.svg',
+                'assets/images/ancologog.svg',
                 width: 25.w,
                 height: 50.h,
               ),
@@ -444,9 +431,7 @@ class _MyStoryViewPageState extends State<MyStoryViewPage>
             'Are you sure you want to delete this story?',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white
-                  : Colors.black,
+              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
               fontSize: 14,
             ),
           ),
@@ -594,9 +579,7 @@ class _MyStoryViewPageState extends State<MyStoryViewPage>
             child: ListTile(
               leading: CircleAvatar(
                 radius: 20,
-                backgroundImage: viewers[index].profUrl.isNotEmpty
-                    ? NetworkImage(viewers[index].profUrl)
-                    : AssetImage('assets/avatar/2.png') as ImageProvider,
+                backgroundImage: viewers[index].profUrl.isNotEmpty ? NetworkImage(viewers[index].profUrl) : AssetImage('assets/avatar/2.png') as ImageProvider,
               ),
               title: Text(
                 viewers[index].name,

@@ -12,7 +12,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -86,7 +86,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),

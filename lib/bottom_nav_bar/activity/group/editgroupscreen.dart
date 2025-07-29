@@ -125,8 +125,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
       }
 
       final response = await http.get(
-        Uri.parse(
-            "${BASE_URL}api/get-chatroom-details?chatRoomId=${widget.chatRoomId}"),
+        Uri.parse("${BASE_URL}api/get-chatroom-details?chatRoomId=${widget.chatRoomId}"),
         headers: {
           'userId': userId,
           'token': token,
@@ -161,9 +160,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
 
   /// Function to Update Group Info
   Future<void> _updateGroup() async {
-    if (_bioController.text.isEmpty &&
-        _groupNameController.text.isEmpty &&
-        _profileImage == null) {
+    if (_bioController.text.isEmpty && _groupNameController.text.isEmpty && _profileImage == null) {
       Fluttertoast.showToast(
         msg: "No changes to update!",
         toastLength: Toast.LENGTH_SHORT,
@@ -226,8 +223,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
           final file = await http.MultipartFile.fromPath(
               'image', // Changed from 'profilePic' to 'image'
               _profileImage!.path,
-              filename:
-                  'group_profile_${DateTime.now().millisecondsSinceEpoch}.jpg');
+              filename: 'group_profile_${DateTime.now().millisecondsSinceEpoch}.jpg');
 
           request.files.add(file);
           print('Image file added to request:');
@@ -265,8 +261,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
       } else {
         print('Error status code: ${streamedResponse.statusCode}');
         print('Error response: $responseData');
-        throw Exception(
-            "Failed to update group: ${streamedResponse.statusCode}");
+        throw Exception("Failed to update group: ${streamedResponse.statusCode}");
       }
     } catch (error) {
       print("Error updating group: $error");
@@ -340,7 +335,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
     }
   }
 
-  void _rewriteBioWithBondChat() async {
+  void _rewriteBioWithancoChat() async {
     if (_bioController.text.isEmpty) return;
 
     // Select all text
@@ -354,9 +349,13 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
     try {
       // Make API Call
       final response = await http.post(
-        Uri.parse("${BASE_URL}api/reWriteWithBond"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"caption": _bioController.text}),
+        Uri.parse("${BASE_URL}api/reWriteWithanco"),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode({
+          "caption": _bioController.text
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -382,8 +381,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    int displayedInterestCount =
-        showAllInterests ? availableInterests.length : 15;
+    int displayedInterestCount = showAllInterests ? availableInterests.length : 15;
     return WillPopScope(
       onWillPop: () async {
         widget.onGroupUpdated?.call();
@@ -426,12 +424,10 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                         backgroundColor: Color(0xFF7400A5),
                         backgroundImage: _profileImage != null
                             ? FileImage(_profileImage!)
-                            : _existingProfilePic != null &&
-                                    _existingProfilePic!.isNotEmpty
+                            : _existingProfilePic != null && _existingProfilePic!.isNotEmpty
                                 ? NetworkImage(_existingProfilePic!)
                                 : null,
-                        child: (_profileImage == null && 
-                                (_existingProfilePic == null || _existingProfilePic!.isEmpty))
+                        child: (_profileImage == null && (_existingProfilePic == null || _existingProfilePic!.isEmpty))
                             ? Padding(
                                 padding: const EdgeInsets.all(6.0),
                                 child: SvgPicture.asset(
@@ -472,8 +468,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                   decoration: InputDecoration(
                     labelText: "Group Name",
                     labelStyle: GoogleFonts.roboto(),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -496,13 +491,11 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                       padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(54.r),
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? const Color(0xFF1E1E1E)
-                            : Colors.grey[100],
+                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.grey[100],
                         border: Border.all(color: const Color(0xFF7400A5)),
                       ),
                       child: GestureDetector(
-                        onTap: _isRewritingBio ? null : _rewriteBioWithBondChat,
+                        onTap: _isRewritingBio ? null : _rewriteBioWithancoChat,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -521,9 +514,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                                     style: GoogleFonts.roboto(
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.w400,
-                                      color: Theme.of(context).brightness == Brightness.dark
-                                          ? AppColors.darkText
-                                          : AppColors.lightText,
+                                      color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText,
                                     ),
                                   ),
                             if (!_isRewritingBio) ...[
@@ -540,7 +531,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                                   ],
                                 ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
                                 child: Text(
-                                  'BondChat',
+                                  'ancoChat',
                                   style: GoogleFonts.roboto(
                                     fontSize: 16.sp,
                                     fontWeight: FontWeight.bold,
@@ -550,7 +541,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                               ),
                               SizedBox(width: 5.w),
                               SvgPicture.asset(
-                                'assets/icons/bondchat_star.svg',
+                                'assets/icons/ancochat_star.svg',
                                 width: 15.w,
                                 height: 15.h,
                               )
@@ -573,8 +564,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     "Select Group Interests",
-                    style: GoogleFonts.roboto(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
                 SizedBox(
@@ -588,11 +578,8 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                       Wrap(
                         spacing: 8.w,
                         runSpacing: 12.h,
-                        children: availableInterests
-                            .take(displayedInterestCount)
-                            .map((interest) {
-                          final isSelected =
-                              selectedInterests.contains(interest);
+                        children: availableInterests.take(displayedInterestCount).map((interest) {
+                          final isSelected = selectedInterests.contains(interest);
                           return GestureDetector(
                             onTap: () {
                               setState(() {
@@ -604,17 +591,11 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                               });
                             },
                             child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 16.w, vertical: 8.h),
+                              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                               decoration: BoxDecoration(
-                                color: isSelected
-                                    ? Color(0xFF7400A5)
-                                    : Colors.transparent,
+                                color: isSelected ? Color(0xFF7400A5) : Colors.transparent,
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                    color: isSelected
-                                        ? Color(0xFF7400A5)
-                                        : Colors.grey.shade400),
+                                border: Border.all(color: isSelected ? Color(0xFF7400A5) : Colors.grey.shade400),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -624,8 +605,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                                     style: GoogleFonts.roboto(
                                       color: isSelected
                                           ? Colors.white
-                                          : Theme.of(context).brightness ==
-                                                  Brightness.dark
+                                          : Theme.of(context).brightness == Brightness.dark
                                               ? Colors.grey.shade300
                                               : Colors.grey.shade800,
                                       fontSize: 14.sp,
@@ -637,8 +617,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                                     size: 16,
                                     color: isSelected
                                         ? Colors.white
-                                        : Theme.of(context).brightness ==
-                                                Brightness.dark
+                                        : Theme.of(context).brightness == Brightness.dark
                                             ? Colors.grey.shade400
                                             : Colors.grey.shade600,
                                   ),
@@ -660,27 +639,17 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                             });
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.black
-                                    : Colors.white,
+                            backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
                             side: BorderSide(
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Color(0xFF7400A5)
-                                  : Color(0xFF7400A5),
+                              color: Theme.of(context).brightness == Brightness.dark ? Color(0xFF7400A5) : Color(0xFF7400A5),
                             ),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                           ),
                           child: Text(
                             "Explore More +",
                             style: GoogleFonts.roboto(
                               fontSize: 14.sp,
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.white
-                                  : Color(0xFF7400A5),
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Color(0xFF7400A5),
                             ),
                           ),
                         ),
@@ -692,15 +661,13 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                   onPressed: isLoading ? null : _updateGroup,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF7400A5),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 40, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                   ),
                   child: isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
                       : Text(
                           "Continue",
-                          style: GoogleFonts.roboto(
-                              fontSize: 16, color: Colors.white),
+                          style: GoogleFonts.roboto(fontSize: 16, color: Colors.white),
                         ),
                 ),
               ],

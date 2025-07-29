@@ -26,7 +26,8 @@ class SettingsScreen extends StatefulWidget {
   final String? referralCode;
   final int? refferCount;
 
-  SettingsScreen({super.key, 
+  SettingsScreen({
+    super.key,
     required this.privacyLev,
     this.referralCode,
     this.refferCount,
@@ -67,9 +68,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showPrivacyToast() {
-    String message = widget.privacyLev
-        ? "Privacy level is ON"
-        : "Privacy level is OFF";
+    String message = widget.privacyLev ? "Privacy level is ON" : "Privacy level is OFF";
 
     Fluttertoast.showToast(
       msg: message,
@@ -94,7 +93,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title: Column(
             children: [
               SvgPicture.asset(
-                'assets/images/bondlogog.svg', // Use the SVG file path
+                'assets/images/ancologog.svg', // Use the SVG file path
                 width: 25.w, // Adjust size as needed
                 height: 50.h,
               ),
@@ -203,16 +202,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.black
-                            : Colors.white, // Set background color to black
+        backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white, // Set background color to black
         appBar: AppBar(
           leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
+            icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           title: Text(
             'Settings',
             style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.w600, color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText),
@@ -227,7 +224,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: 'Edit Profile',
               onTap: () {
                 // Navigate to Edit Profile Screen
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> EditProfileScreen(avatar: '', selectedInterests: <String>[])));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfileScreen(avatar: '', selectedInterests: <String>[])));
               },
             ),
             _buildSettingsItem(
@@ -262,28 +259,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
               icon: Icons.password_rounded,
               title: 'Change Password',
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> ChangePasswordScreen()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ChangePasswordScreen()));
               },
             ),
             _buildSettingsItem(
               icon: Icons.note_alt_rounded,
               title: 'Terms & Conditions',
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> TermsAndConditionsScreen()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => TermsAndConditionsScreen()));
               },
             ),
             _buildSettingsItem(
               icon: Icons.privacy_tip,
               title: 'Privacy Policy',
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> PrivacyPolicyScreen()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => PrivacyPolicyScreen()));
               },
             ),
             _buildSettingsItem(
               icon: Icons.delete,
               title: 'Delete Account',
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> DeleteAccountScreen()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => DeleteAccountScreen()));
               },
             ),
             if (widget.referralCode != null)
@@ -343,7 +340,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 SvgPicture.asset(
-                  'assets/images/bondlogog.svg',
+                  'assets/images/ancologog.svg',
                   width: 25.w,
                   height: 50.h,
                 ),
@@ -404,9 +401,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             fontSize: 12,
                           ),
                         ),
-                        trailing: currentVoice == 'Bon' 
-                          ? Icon(Icons.check_circle, color: Color(0xFF7400A5))
-                          : null,
+                        trailing: currentVoice == 'Bon' ? Icon(Icons.check_circle, color: Color(0xFF7400A5)) : null,
                         onTap: () async {
                           await _saveVoicePreference('Bon');
                           await VoiceSettings.setSelectedVoice('male');
@@ -541,9 +536,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             fontSize: 12,
                           ),
                         ),
-                        trailing: currentVoice == 'Sora' 
-                          ? Icon(Icons.check_circle, color: Color(0xFF7400A5))
-                          : null,
+                        trailing: currentVoice == 'Sora' ? Icon(Icons.check_circle, color: Color(0xFF7400A5)) : null,
                         onTap: () async {
                           await _saveVoicePreference('Sora');
                           await VoiceSettings.setSelectedVoice('female');

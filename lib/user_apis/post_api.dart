@@ -48,7 +48,11 @@ Future<void> submitPost({
   try {
     for (final file in mediaFiles) {
       final fileExt = file.path.split('.').last.toLowerCase();
-      final isVideo = ['mp4', 'mov', 'avi'].contains(fileExt);
+      final isVideo = [
+        'mp4',
+        'mov',
+        'avi'
+      ].contains(fileExt);
 
       final part = await http.MultipartFile.fromPath(
         isVideo ? 'video' : 'image',
@@ -85,7 +89,7 @@ Future<Map<String, String>?> _uploadFile({
   required String userid,
   required String token,
 }) async {
-  const uploadUrl = 'https://node-service-preprod.bondbridge.ai/api/fileUpload?entityType=community';
+  const uploadUrl = 'https://node-service-preprod.ancobridge.ai/api/fileUpload?entityType=community';
   final request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
 
   request.headers.addAll({
@@ -118,7 +122,10 @@ Future<Map<String, String>?> _uploadFile({
 
         if (uploadedUrl != null) {
           log('File uploaded successfully: $uploadedUrl');
-          return {'url': uploadedUrl, 'type': fileType};
+          return {
+            'url': uploadedUrl,
+            'type': fileType
+          };
         }
       }
 
@@ -183,9 +190,7 @@ Future<void> submitCommunityPost({
       'Content-Type': 'application/json',
     };
 
-    final response = await (isEdit
-        ? http.put(url, headers: headers, body: jsonEncode(requestBody))
-        : http.post(url, headers: headers, body: jsonEncode(requestBody)));
+    final response = await (isEdit ? http.put(url, headers: headers, body: jsonEncode(requestBody)) : http.post(url, headers: headers, body: jsonEncode(requestBody)));
 
     Navigator.pop(context);
 
@@ -193,7 +198,6 @@ Future<void> submitCommunityPost({
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(isEdit ? 'Post Updated Successfully' : 'Post Uploaded Successfully')),
       );
-      
     } else {
       final errorData = jsonDecode(response.body);
       log('Error submitting post: ${response.statusCode}, Body: ${response.body}');

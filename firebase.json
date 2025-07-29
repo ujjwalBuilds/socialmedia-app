@@ -1,1 +1,22 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"bondbridge-5bb5b","appId":"1:1038776736651:android:2a9dfcb7bc5f01addaed8e","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"bondbridge-5bb5b","configurations":{"android":"1:1038776736651:android:2a9dfcb7bc5f01addaed8e","ios":"1:1038776736651:ios:6a83bd76d97a749fdaed8e"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "ancobridge-5bb5b",
+          "appId": "1:1038776736651:android:2a9dfcb7bc5f01addaed8e",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "ancobridge-5bb5b",
+          "configurations": {
+            "android": "1:1038776736651:android:2a9dfcb7bc5f01addaed8e",
+            "ios": "1:1038776736651:ios:6a83bd76d97a749fdaed8e"
+          }
+        }
+      }
+    }
+  }
+}

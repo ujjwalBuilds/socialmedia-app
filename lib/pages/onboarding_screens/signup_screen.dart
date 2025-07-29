@@ -356,16 +356,16 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
                 // Center(
                 //   child: SvgPicture.asset(
-                //     'assets/images/bondlogog.svg', // Use the SVG file path
+                //     'assets/images/ancologog.svg', // Use the SVG file path
                 //     width: 150.w, // Adjust size as needed
                 //     height: 150.h,
                 //   ),
                 // ),
-                
+
                 // Center(
                 //   child: Text.rich(
                 //     TextSpan(
-                //       text: "BondBridge",
+                //       text: "ancoBridge",
                 //       style: GoogleFonts.leagueSpartan(
                 //         fontSize: 25.sp, // Adjust based on your needs
                 //         fontWeight: FontWeight.w800,

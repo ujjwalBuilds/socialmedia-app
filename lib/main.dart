@@ -41,8 +41,7 @@ import 'package:socialmedia/utils/colors.dart';
 
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-final FlutterLocalNotificationsPlugin localNotifications =
-    FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin localNotifications = FlutterLocalNotificationsPlugin();
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -121,8 +120,7 @@ Future<void> _handleNotificationPayload(String payload) async {
 
     // Handle nested JSON in data field
     final dynamic data = decoded['data'];
-    final Map<String, dynamic> notificationData =
-        data is String ? jsonDecode(data) : data;
+    final Map<String, dynamic> notificationData = data is String ? jsonDecode(data) : data;
 
     final type = notificationData['type']?.toString() ?? '';
     print('Notification type: $type');
@@ -134,9 +132,7 @@ Future<void> _handleNotificationPayload(String payload) async {
       return;
     }
 
-    if (type == 'reaction' ||
-        type == 'comment' ||
-        type == 'followRequestSend') {
+    if (type == 'reaction' || type == 'comment' || type == 'followRequestSend') {
       navigatorKey.currentState?.pushNamed('/notifications');
     } else if (type == 'message') {
       navigatorKey.currentState?.pushNamed('/activity');
@@ -177,9 +173,7 @@ void setupFirebaseListeners() {
   // Foreground messages
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
     print("Foreground message received: ${message.notification?.title}");
-    Provider.of<NotificationProvider>(navigatorKey.currentContext!,
-            listen: false)
-        .showNotification();
+    Provider.of<NotificationProvider>(navigatorKey.currentContext!, listen: false).showNotification();
 
     // Handle call notifications immediately
     if (message.data['type'] == 'call') {
@@ -239,9 +233,7 @@ void setupFirebaseListeners() {
   });
 
   // Initial message when app is launched from terminated state
-  FirebaseMessaging.instance
-      .getInitialMessage()
-      .then((RemoteMessage? message) async {
+  FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) async {
     if (message != null) {
       print("App launched from notification: ${message.notification?.title}");
       await _handleNotificationPayload(jsonEncode({
@@ -260,7 +252,7 @@ Future<void> initCallKit() async {
     'cancelButton': 'Cancel',
     'okButton': 'Ok',
     'foregroundService': {
-      'channelId': 'com.bondbridge.bondbridgeonline',
+      'channelId': 'com.ancobridge.ancobridgeonline',
       'channelName': 'Foreground service for incoming calls',
       'notificationTitle': 'Call service is running',
       'notificationIcon': 'ic_notification',
@@ -285,8 +277,7 @@ Future<void> initCallKit() async {
 
     switch (event.event) {
       case Event.actionCallAccept:
-        await callHandler.handleAcceptCall(
-            callId, callType, callerName, profilePic);
+        await callHandler.handleAcceptCall(callId, callType, callerName, profilePic);
         break;
       case 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE':
       case 'com.hiennv.flutter_callkit_incoming.ACTION_CALL_TIMEOUT':
@@ -395,15 +386,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     return InAppNotification(
       child: MaterialApp(
         navigatorKey: navigatorKey,
-        navigatorObservers: [routeObserver],
+        navigatorObservers: [
+          routeObserver
+        ],
         routes: {
           '/notifications': (_) => NotificationsPage(),
           '/activity': (_) => ChatScreen(),
         },
-        theme: ThemeData(
-            brightness: Brightness.light, primaryColor: AppColors.lightPrimary),
-        darkTheme: ThemeData(
-            brightness: Brightness.dark, primaryColor: AppColors.darkPrimary),
+        theme: ThemeData(brightness: Brightness.light, primaryColor: AppColors.lightPrimary),
+        darkTheme: ThemeData(brightness: Brightness.dark, primaryColor: AppColors.darkPrimary),
         themeMode: ThemeMode.system,
         debugShowCheckedModeBanner: false,
         home: SafeArea(

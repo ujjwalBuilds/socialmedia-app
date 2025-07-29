@@ -45,32 +45,34 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _showCountryCodeDialog(BuildContext context) {
-  showCountryPicker(
-    context: context,
-    showPhoneCode: true,
-    onSelect: (Country country) {
-      setState(() {
-        _selectedCountryCode = "+${country.phoneCode}"; // Update country code
-      });
-    },
-    countryListTheme: CountryListThemeData(
-      borderRadius: BorderRadius.circular(16.0),
-      inputDecoration: InputDecoration(
-        hintText: "Search country...",
-        prefixIcon: Icon(Icons.search, color: Colors.grey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+    showCountryPicker(
+      context: context,
+      showPhoneCode: true,
+      onSelect: (Country country) {
+        setState(() {
+          _selectedCountryCode = "+${country.phoneCode}"; // Update country code
+        });
+      },
+      countryListTheme: CountryListThemeData(
+        borderRadius: BorderRadius.circular(16.0),
+        inputDecoration: InputDecoration(
+          hintText: "Search country...",
+          prefixIcon: Icon(Icons.search, color: Colors.grey),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          filled: true,
+          fillColor: Colors.grey.shade100,
         ),
-        filled: true,
-        fillColor: Colors.grey.shade100,
+        textStyle: TextStyle(
+          fontSize: 16,
+          color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText,
+        ),
+        searchTextStyle: TextStyle(fontSize: 14, color: Colors.black54),
       ),
-      textStyle: TextStyle(fontSize: 16, color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText,
-        ),
-      searchTextStyle: TextStyle(fontSize: 14, color: Colors.black54),
-    ),
-  );
-}
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,12 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
             width: double.infinity,
             height: MediaQuery.of(context).size.height,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: Theme.of(context).brightness == Brightness.dark
-                      ? AppColors.darkGradient
-                      : AppColors.lightGradient),
+              gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: Theme.of(context).brightness == Brightness.dark ? AppColors.darkGradient : AppColors.lightGradient),
             ),
             child: SafeArea(
               child: Column(
@@ -99,25 +96,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 40.w),
                     child: Text(
                       "Let's Get Started",
-                      style: GoogleFonts.montserrat(
-                          fontSize: 32.sp,
-                          fontWeight: FontWeight.w500,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? AppColors.darkText
-                              : AppColors.lightText),
+                      style: GoogleFonts.montserrat(fontSize: 32.sp, fontWeight: FontWeight.w500, color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText),
                     ),
                   ),
-                  SizedBox(height: 10.h,),
+                  SizedBox(
+                    height: 10.h,
+                  ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 40.w),
                     child: Text(
                       "Login...",
-                      style: GoogleFonts.montserrat(
-                          fontSize: 24.sp,
-                          fontWeight: FontWeight.w500,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? AppColors.darkText
-                              : AppColors.lightText),
+                      style: GoogleFonts.montserrat(fontSize: 24.sp, fontWeight: FontWeight.w500, color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText),
                     ),
                   ),
                   SizedBox(
@@ -126,55 +115,42 @@ class _LoginScreenState extends State<LoginScreen> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 40.w),
                     child: Container(
-                    // decoration:
-                    //     BoxDecoration(border: Border.all(color: Theme.of(context).brightness == Brightness.dark
-                    //       ? Colors.white60
-                    //       : Colors.grey.shade600,)),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () => _showCountryCodeDialog(context),
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 15.5.h, horizontal: 10.w),
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(12),
-                               border: Border.all(
-                                color: const Color(0xFF7400A5),
-                                width: 1.25
-                              )
-                               
-                            ),
-                            child: Text(
-                              _selectedCountryCode,
-                              style: GoogleFonts.montserrat(
-                                  fontSize: 16.sp, color: Theme.of(context).brightness == Brightness.dark
-                          ? AppColors.darkText
-                          : AppColors.lightText,
-                  ),
+                      // decoration:
+                      //     BoxDecoration(border: Border.all(color: Theme.of(context).brightness == Brightness.dark
+                      //       ? Colors.white60
+                      //       : Colors.grey.shade600,)),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () => _showCountryCodeDialog(context),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 15.5.h, horizontal: 10.w),
+                              decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF7400A5), width: 1.25)),
+                              child: Text(
+                                _selectedCountryCode,
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 16.sp,
+                                  color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(width: 10.w),
-                        Expanded(
-                          child: TextField(
-                            controller: _phone,
-                            decoration: InputDecoration(
-                              hintText: "Enter Your Phone",
-                              hintStyle: GoogleFonts.montserrat(
-                                  fontSize: 16.sp,
-                                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
-                              filled: true,
-                              fillColor: Colors.transparent,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                      color: const Color(0xFF7400A5), // Black border in light mode
-                                      width: 1.25, // Border thickness
-                                    )
-                              ),
-                              enabledBorder: OutlineInputBorder(
+                          SizedBox(width: 10.w),
+                          Expanded(
+                            child: TextField(
+                              controller: _phone,
+                              decoration: InputDecoration(
+                                  hintText: "Enter Your Phone",
+                                  hintStyle: GoogleFonts.montserrat(fontSize: 16.sp, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
+                                  filled: true,
+                                  fillColor: Colors.transparent,
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: const Color(0xFF7400A5), // Black border in light mode
+                                        width: 1.25, // Border thickness
+                                      )),
+                                  enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide: BorderSide(
                                       color: const Color(0xFF7400A5),
@@ -187,18 +163,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                       color: const Color(0xFF7400A5), // Blue border when focused
                                       width: 1.25,
                                     ),
-                                  )
+                                  )),
+                              style: TextStyle(
+                                color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText,
+                              ),
+                              keyboardType: TextInputType.phone,
                             ),
-                            style:  TextStyle(color: Theme.of(context).brightness == Brightness.dark
-                          ? AppColors.darkText
-                          : AppColors.lightText,
-                  ),
-                            keyboardType: TextInputType.phone,
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
                   ),
                   SizedBox(
                     height: 18.h,
@@ -212,35 +186,28 @@ class _LoginScreenState extends State<LoginScreen> {
                         obscureText: isshown,
                         controller: _pass,
                         decoration: InputDecoration(
-                          //prefixIcon: const Icon(Icons.phone, color: Colors.white),
-                          hintText: "Password",
-                          suffixIcon: InkWell(
-                              onTap: () {
-                                setState(() {
-                                  isshown = !isshown;
-                                });
-                              },
-                              child: Icon(
-                                Icons.remove_red_eye,
-                                color: Color(0xFF7400A5),
-                              )),
-                  
-                          hintStyle: GoogleFonts.montserrat(
-                              fontSize: 16.sp,
-                              color:
-                                  Theme.of(context).brightness == Brightness.dark
-                                      ? AppColors.darkText
-                                      : AppColors.lightText),
-                          filled: true,
-                          fillColor: Colors.transparent,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                                color: Color(0xFF7400A5), // Change border color
-                                width: 1.25, // Border thickness
-                              )
-                          ),
-                          enabledBorder: OutlineInputBorder(
+                            //prefixIcon: const Icon(Icons.phone, color: Colors.white),
+                            hintText: "Password",
+                            suffixIcon: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    isshown = !isshown;
+                                  });
+                                },
+                                child: Icon(
+                                  Icons.remove_red_eye,
+                                  color: Color(0xFF7400A5),
+                                )),
+                            hintStyle: GoogleFonts.montserrat(fontSize: 16.sp, color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText),
+                            filled: true,
+                            fillColor: Colors.transparent,
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Color(0xFF7400A5), // Change border color
+                                  width: 1.25, // Border thickness
+                                )),
+                            enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide(
                                 color: const Color(0xFF7400A5), // Border color when not focused
@@ -253,29 +220,29 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: const Color(0xFF7400A5), // Border color when the field is focused
                                 width: 1.25,
                               ),
-                            )
+                            )),
+                        style: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText,
                         ),
-                        style:  TextStyle(color: Theme.of(context).brightness == Brightness.dark
-                          ? AppColors.darkText
-                          : AppColors.lightText,
-                  ),
                         //keyboardType: TextInputType.phone,
                       ),
                     ),
                   ),
-                  SizedBox(height: 6.h,),
+                  SizedBox(
+                    height: 6.h,
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(right: 40),
                     child: InkWell(
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> ChangePass()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ChangePass()));
                       },
                       child: Align(
                         alignment: Alignment.topRight,
-                        child: Text('Forgot Password' , style: GoogleFonts.poppins(
-                          fontSize: 12.sp,
-                          decoration: TextDecoration.underline
-                        ),),
+                        child: Text(
+                          'Forgot Password',
+                          style: GoogleFonts.poppins(fontSize: 12.sp, decoration: TextDecoration.underline),
+                        ),
                       ),
                     ),
                   ),
@@ -285,12 +252,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Center(
                     child: Text(
                       'New Here?',
-                      style: GoogleFonts.montserrat(
-                        fontWeight: FontWeight.w500,
-                          fontSize: 14.sp,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? AppColors.darkText
-                              : AppColors.lightText),
+                      style: GoogleFonts.montserrat(fontWeight: FontWeight.w500, fontSize: 14.sp, color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText),
                     ),
                   ),
                   SizedBox(
@@ -304,17 +266,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         Expanded(
                           child: Container(
                             height: 1,
-                            decoration:  BoxDecoration(
+                            decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: Theme.of(context).brightness == Brightness.dark
-                                  ? [
-                                      Colors.white, // Start transparent
-                                      Colors.white24, // End light
-                                    ]
-                                  : [
-                                      Colors.black, // Start transparent
-                                      Colors.black54, // End light
-                                    ],
+                                    ? [
+                                        Colors.white, // Start transparent
+                                        Colors.white24, // End light
+                                      ]
+                                    : [
+                                        Colors.black, // Start transparent
+                                        Colors.black54, // End light
+                                      ],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
                               ),
@@ -324,20 +286,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         // "or" Text
                         InkWell(
                           onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => SignupScreen()));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => SignupScreen()));
                           },
                           child: Text(
                             '  Signup',
-                            style: GoogleFonts.montserrat(
-                              fontWeight: FontWeight.w500,
-                                fontSize: 20.sp,
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? AppColors.darkText
-                                    : AppColors.lightText),
+                            style: GoogleFonts.montserrat(fontWeight: FontWeight.w500, fontSize: 20.sp, color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText),
                           ),
                         ),
                         const Padding(
@@ -355,17 +308,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         Expanded(
                           child: Container(
                             height: 1,
-                            decoration:  BoxDecoration(
+                            decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: Theme.of(context).brightness == Brightness.dark
-                                  ? [
-                                      Colors.white, // Start transparent
-                                      Colors.white24, // End light
-                                    ]
-                                  : [
-                                      Colors.black, // Start transparent
-                                      Colors.black54, // End light
-                                    ],
+                                    ? [
+                                        Colors.white, // Start transparent
+                                        Colors.white24, // End light
+                                      ]
+                                    : [
+                                        Colors.black, // Start transparent
+                                        Colors.black54, // End light
+                                      ],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
                               ),
@@ -381,26 +334,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Center(
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                            minimumSize: Size(350.w, 56.h),
-                            backgroundColor: Color(0xFF7400A5),),
+                          minimumSize: Size(350.w, 56.h),
+                          backgroundColor: Color(0xFF7400A5),
+                        ),
                         onPressed: () async {
                           WidgetsBinding.instance.addPostFrameCallback((_) {
                             FocusScope.of(context).unfocus();
                           });
                           _loginuser();
-                          final SharedPreferences prefs =
-                              await SharedPreferences.getInstance();
+                          final SharedPreferences prefs = await SharedPreferences.getInstance();
                           final usertoken = prefs.getString('user_token');
                           print('#### yelo token');
                           print(usertoken);
                         },
                         child: _isLoading
-                            ? LoadingAnimationWidget.inkDrop(
-                            color: Colors.white,
-                            size: 25.sp
-                                
-                                
-                              )
+                            ? LoadingAnimationWidget.inkDrop(color: Colors.white, size: 25.sp)
                             : Text(
                                 'Login',
                                 style: GoogleFonts.montserrat(
@@ -417,7 +365,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   // Center(
                   //   child: SvgPicture.asset(
-                  //     'assets/images/bondlogog.svg', // Use the SVG file path
+                  //     'assets/images/ancologog.svg', // Use the SVG file path
                   //     width: 150.w, // Adjust size as needed
                   //     height: 150.h,
                   //   ),
@@ -425,7 +373,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Center(
                   //   child: Text.rich(
                   //     TextSpan(
-                  //       text: "BondBridge",
+                  //       text: "ancoBridge",
                   //       style: GoogleFonts.leagueSpartan(
                   //         fontSize: 25.sp, // Adjust based on your needs
                   //         fontWeight: FontWeight.w800,
@@ -447,9 +395,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   //     ),
                   //   ),
                   // ),
-                  
-                  
-                  
                 ],
               ),
             ),

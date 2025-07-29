@@ -515,17 +515,13 @@ class _PostCardState extends State<PostCard> {
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProviderall>(context, listen: false);
     final mediaList = widget.post.media is List ? widget.post.media as List : [];
-    final isVideoPost =
-        mediaList.any((media) => (media['url'] ?? '').toLowerCase().endsWith('.mp4') || (media['url'] ?? '').toLowerCase().endsWith('.mov'));
+    final isVideoPost = mediaList.any((media) => (media['url'] ?? '').toLowerCase().endsWith('.mp4') || (media['url'] ?? '').toLowerCase().endsWith('.mov'));
 
     return Container(
       decoration: BoxDecoration(
           color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
           border: Border(
-            bottom: BorderSide(
-                color:
-                    Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade900.withOpacity(0.8) : Colors.grey.shade300.withOpacity(0.8),
-                width: 2),
+            bottom: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade900.withOpacity(0.8) : Colors.grey.shade300.withOpacity(0.8), width: 2),
           )),
       margin: const EdgeInsets.only(bottom: 1),
       child: Column(
@@ -550,9 +546,7 @@ class _PostCardState extends State<PostCard> {
                 _navigateToUserProfile(currentUserId, widget.post.userid);
               },
               child: CircleAvatar(
-                backgroundImage: widget.post.profilepic == null || widget.post.profilepic!.isEmpty
-                    ? const AssetImage('assets/avatar/4.png')
-                    : CachedNetworkImageProvider(widget.post.profilepic!),
+                backgroundImage: widget.post.profilepic == null || widget.post.profilepic!.isEmpty ? const AssetImage('assets/avatar/4.png') : CachedNetworkImageProvider(widget.post.profilepic!),
                 radius: 17,
               ),
             ),
@@ -600,8 +594,7 @@ class _PostCardState extends State<PostCard> {
           if (widget.post.content.isNotEmpty && mediaList.isEmpty)
             Padding(
               padding: const EdgeInsets.only(left: 10),
-              child: Text(widget.post.content,
-                  style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText, fontSize: 14)),
+              child: Text(widget.post.content, style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText, fontSize: 14)),
             ),
           if (mediaList.isNotEmpty)
             Padding(
@@ -699,8 +692,7 @@ class _PostCardState extends State<PostCard> {
                       const SizedBox(width: 4),
                       Text(
                         '${widget.post.commentcount}',
-                        style: TextStyle(
-                            color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText, fontSize: 13),
+                        style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText, fontSize: 13),
                       ),
                       const SizedBox(width: 16),
                       _buildReactionDisplayButton(),
@@ -709,8 +701,7 @@ class _PostCardState extends State<PostCard> {
                       const Spacer(),
                       Text(
                         widget.post.agoTime,
-                        style: TextStyle(
-                            color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText, fontSize: 12),
+                        style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText, fontSize: 12),
                       ),
                     ],
                   ),
@@ -912,7 +903,7 @@ class ThreeDotsMenu extends StatelessWidget {
                 title: Column(
                   children: [
                     SvgPicture.asset(
-                      'assets/images/bondlogog.svg',
+                      'assets/images/ancologog.svg',
                       width: 25.w,
                       height: 50.h,
                     ),
@@ -1250,9 +1241,7 @@ class _MediaKitVideoPlayerState extends State<MediaKitVideoPlayer> {
                   final bool isPlaying = combinedState.playing;
                   final bool isCompleted = combinedState.completed;
 
-                  final double videoAspectRatio = (videoWidth != null && videoHeight != null && videoWidth > 0 && videoHeight > 0)
-                      ? videoWidth / videoHeight
-                      : widget.aspectRatio;
+                  final double videoAspectRatio = (videoWidth != null && videoHeight != null && videoWidth > 0 && videoHeight > 0) ? videoWidth / videoHeight : widget.aspectRatio;
 
                   final double videoHeightCalc = constraints.maxWidth / videoAspectRatio;
 
@@ -1306,9 +1295,7 @@ class _MediaKitVideoPlayerState extends State<MediaKitVideoPlayer> {
                       height: (() {
                         final int? videoWidth = combinedState.width;
                         final int? videoHeight = combinedState.height;
-                        final double aspectRatio = (videoWidth != null && videoHeight != null && videoWidth > 0 && videoHeight > 0)
-                            ? videoWidth / videoHeight
-                            : widget.aspectRatio;
+                        final double aspectRatio = (videoWidth != null && videoHeight != null && videoWidth > 0 && videoHeight > 0) ? videoWidth / videoHeight : widget.aspectRatio;
                         return constraints.maxWidth / aspectRatio;
                       })(),
                       child: Container(

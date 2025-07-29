@@ -19,7 +19,6 @@ class _StartScreenState extends State<StartScreen> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.black,
-
         body: SafeArea(
           child: SingleChildScrollView(
             child: Column(
@@ -58,7 +57,7 @@ class _StartScreenState extends State<StartScreen> {
                                   ),
                                 ),
                                 TextSpan(
-                                  text: "BondBridge, ",
+                                  text: "ancoBridge, ",
                                   style: GoogleFonts.leagueSpartan(
                                     fontSize: 30.sp,
                                     fontWeight: FontWeight.w700,
@@ -116,7 +115,7 @@ class _StartScreenState extends State<StartScreen> {
                         child: SizedBox(
                           height: 100,
                           child: SvgPicture.asset(
-                            'assets/images/bondlogog.svg',
+                            'assets/images/ancologog.svg',
                             width: 130,
                             height: 130,
                           ),

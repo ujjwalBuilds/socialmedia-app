@@ -17,7 +17,7 @@ class ReportIssueScreen extends StatefulWidget {
 class _ReportIssueScreenState extends State<ReportIssueScreen> {
   final TextEditingController _issueController = TextEditingController();
   File? _selectedImage;
-  
+
   Future<void> _pickImage() async {
     final ImagePicker _picker = ImagePicker();
     try {
@@ -61,17 +61,17 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
           backgroundColor: Colors.black26,
           elevation: 0,
           leading: IconButton(
-            icon:  Icon(Icons.arrow_back_ios, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
+            icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
             onPressed: () => Navigator.pop(context),
           ),
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-               Icon(Icons.support_agent, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
+              Icon(Icons.support_agent, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
               SizedBox(width: 8.w),
               Text(
                 "Customer Support",
-                style: GoogleFonts.roboto(fontWeight: FontWeight.w600 ,color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, fontSize: 18),
+                style: GoogleFonts.roboto(fontWeight: FontWeight.w600, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, fontSize: 18),
               ),
             ],
           ),
@@ -86,9 +86,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                 // Profile Info
                 CircleAvatar(
                   radius: 40.sp,
-                  backgroundImage: profileimage != null 
-                      ? NetworkImage(profileimage)
-                      : const AssetImage('assets/images/default_profile.png') as ImageProvider,
+                  backgroundImage: profileimage != null ? NetworkImage(profileimage) : const AssetImage('assets/images/default_profile.png') as ImageProvider,
                 ),
                 const SizedBox(height: 10),
                 Text(
@@ -99,9 +97,9 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-        
+
                 const SizedBox(height: 20),
-        
+
                 // Issue Description Input
                 TextField(
                   controller: _issueController,
@@ -119,7 +117,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
-        
+
                 // Selected Image Preview
                 if (_selectedImage != null) ...[
                   Container(
@@ -150,7 +148,8 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.close, 
+                        Icon(
+                          Icons.close,
                           color: Colors.red,
                           size: 16,
                         ),
@@ -167,7 +166,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                   ),
                   const SizedBox(height: 10),
                 ],
-                
+
                 // Add Photo Button
                 InkWell(
                   onTap: _pickImage,
@@ -183,7 +182,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                   ),
                 ),
                 SizedBox(height: 30.h),
-        
+
                 // Support Info
                 Text(
                   "You Can Also Reach Out To Us 👋",
@@ -195,7 +194,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                 ),
                 SizedBox(height: 10.h),
                 Text(
-                  "Support Email:\n info@bondbridge.ai",
+                  "Support Email:\n info@ancobridge.ai",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.roboto(
                     fontSize: 14,
@@ -212,7 +211,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                 //   ),
                 // ),
                 const SizedBox(height: 40),
-        
+
                 // Submit Button
                 SizedBox(
                   width: double.infinity,

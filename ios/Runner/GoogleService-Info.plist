@@ -9,11 +9,11 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.Bondbridge.com</string>
+	<string>com.ancobridge.com</string>
 	<key>PROJECT_ID</key>
-	<string>bondbridge-5bb5b</string>
+	<string>ancobridge-5bb5b</string>
 	<key>STORAGE_BUCKET</key>
-	<string>bondbridge-5bb5b.firebasestorage.app</string>
+	<string>ancobridge-5bb5b.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>

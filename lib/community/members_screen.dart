@@ -52,9 +52,7 @@ class _MembersScreenState extends State<MembersScreen> {
 
   // --- NEW: Scroll listener to trigger fetching the next page ---
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200 &&
-        _hasNextPage &&
-        !_isLoadingMore) {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200 && _hasNextPage && !_isLoadingMore) {
       log("Fetching next page...");
       _fetchMembers(page: _currentPage + 1);
     }
@@ -77,7 +75,7 @@ class _MembersScreenState extends State<MembersScreen> {
     }
 
     // You can replace this with a constant from your project
-    const String baseUrl = "https://admin.bondbridge.ai/api";
+    const String baseUrl = "https://admin.ancobridge.ai/api";
     final uri = Uri.parse('$baseUrl/communities/${widget.communityId}/membersOfCommunity?page=$page&limit=20');
 
     try {
@@ -99,7 +97,7 @@ class _MembersScreenState extends State<MembersScreen> {
     } catch (e) {
       log('An error occurred: $e');
     } finally {
-      if(mounted) {
+      if (mounted) {
         setState(() {
           _isFirstLoad = false;
           _isLoadingMore = false;
@@ -113,12 +111,7 @@ class _MembersScreenState extends State<MembersScreen> {
   void _filterMembers() {
     final query = searchController.text.toLowerCase();
     setState(() {
-      _filteredMembers = _allMembers
-          .where((member) => (member['name'] ?? '')
-              .toString()
-              .toLowerCase()
-              .contains(query))
-          .toList();
+      _filteredMembers = _allMembers.where((member) => (member['name'] ?? '').toString().toLowerCase().contains(query)).toList();
     });
   }
 
@@ -169,7 +162,7 @@ class _MembersScreenState extends State<MembersScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 // --- MODIFIED: Main content area now handles loading states ---
                 Expanded(
                   child: _isFirstLoad
@@ -194,11 +187,9 @@ class _MembersScreenState extends State<MembersScreen> {
                                     ),
                                   );
                                 }
-                                
+
                                 final member = _filteredMembers[index];
-                                final name = member['name']?.toString().isNotEmpty == true
-                                    ? member['name']
-                                    : 'User'; // Fallback name
+                                final name = member['name']?.toString().isNotEmpty == true ? member['name'] : 'User'; // Fallback name
                                 final profilePic = member['profilePic'];
                                 final avatar = member['avatar'];
                                 final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
@@ -211,10 +202,7 @@ class _MembersScreenState extends State<MembersScreen> {
                                         : (avatar != null && avatar.isNotEmpty)
                                             ? NetworkImage(avatar)
                                             : null,
-                                    child: (profilePic == null || profilePic.isEmpty) &&
-                                            (avatar == null || avatar.isEmpty)
-                                        ? Text(initial, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))
-                                        : null,
+                                    child: (profilePic == null || profilePic.isEmpty) && (avatar == null || avatar.isEmpty) ? Text(initial, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)) : null,
                                   ),
                                   title: Text(name, style: const TextStyle(color: Colors.white)),
                                   subtitle: const Text('member', style: TextStyle(color: Colors.grey)),

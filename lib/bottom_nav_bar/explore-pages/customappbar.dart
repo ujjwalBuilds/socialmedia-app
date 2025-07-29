@@ -10,7 +10,7 @@
 // import 'package:socialmedia/api_service/user_provider.dart';
 // import 'package:socialmedia/bottom_nav_bar/activity/acitivity_screen.dart';
 // import 'package:socialmedia/bottom_nav_bar/explore-pages/searchpage.dart';
-// import 'package:socialmedia/users/Bondchat.dart';
+// import 'package:socialmedia/users/ancochat.dart';
 // import 'package:socialmedia/users/profile_screen.dart';
 
 // class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
@@ -70,7 +70,7 @@
 //                           child: SizedBox(
 //                               height: 40.h,
 //                               child: SvgPicture.asset(
-//                                 'assets/images/bondlogog.svg', // Use the SVG file path
+//                                 'assets/images/ancologog.svg', // Use the SVG file path
 //                                 width: 10.w, // Adjust size as needed
 //                                 height: 35.h,
 //                               )),
@@ -78,7 +78,7 @@
 //                         SizedBox(width: 1.w),
 //                         Text.rich(
 //                           TextSpan(
-//                             text: "BondBridge",
+//                             text: "ancoBridge",
 //                             style: GoogleFonts.leagueSpartan(
 //                               fontSize: 28.sp, // Adjust based on your needs
 //                               fontWeight: FontWeight.w800,
@@ -119,7 +119,7 @@
 //                               ),
 //                               child: InkWell(
 //                                 onTap: () {
-//                                   Navigator.push(context, MaterialPageRoute(builder: (context) => const BondChatScreen()));
+//                                   Navigator.push(context, MaterialPageRoute(builder: (context) => const ancoChatScreen()));
 //                                 },
 //                                 child: Row(
 //                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -129,14 +129,14 @@
 //                                       child: Row(
 //                                         children: [
 //                                           SvgPicture.asset(
-//                                             'assets/icons/bondchat_star.svg',
+//                                             'assets/icons/ancochat_star.svg',
 //                                             width: 15.w,
 //                                             height: 15.h,
 //                                             color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
 //                                           ),
 //                                           SizedBox(width: 5.w),
 //                                           Text(
-//                                             'BondChat',
+//                                             'ancoChat',
 //                                             style: GoogleFonts.roboto(
 //                                               fontSize: 16.sp,
 //                                               fontWeight: FontWeight.bold,
@@ -165,11 +165,11 @@
 //                             ),
 //                           ],
 //                         ),
-//                         // Text positioned directly under BondChat button
+//                         // Text positioned directly under ancoChat button
 //                         Padding(
-//                           padding: EdgeInsets.only(right: 68.w), // Adjust right padding to align under BondChat
+//                           padding: EdgeInsets.only(right: 68.w), // Adjust right padding to align under ancoChat
 //                           child: Text(
-//                             'Hi I am BondChat',
+//                             'Hi I am ancoChat',
 //                             style: GoogleFonts.roboto(
 //                               fontSize: 12.sp, // Smaller font to prevent overflow
 //                               color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black54,
@@ -219,7 +219,7 @@
 //     return FadeTransition(
 //       opacity: _blinkAnimation,
 //       child: Text(
-//         'Hi! I am BondChat',
+//         'Hi! I am ancoChat',
 //         style: GoogleFonts.roboto(
 //           fontSize: 12.sp,
 //           color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
@@ -242,7 +242,7 @@
 // import 'package:socialmedia/api_service/user_provider.dart';
 // import 'package:socialmedia/bottom_nav_bar/activity/acitivity_screen.dart';
 // import 'package:socialmedia/bottom_nav_bar/explore-pages/searchpage.dart';
-// import 'package:socialmedia/users/Bondchat.dart';
+// import 'package:socialmedia/users/ancochat.dart';
 // import 'package:socialmedia/users/profile_screen.dart';
 
 // class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
@@ -272,7 +272,7 @@
 //       setState(() {}); // Refresh UI after loading data
 //     });
 
-//     // Original blinking animation for BondChat button
+//     // Original blinking animation for ancoChat button
 //     _blinkController = AnimationController(
 //       duration: const Duration(milliseconds: 850),
 //       vsync: this,
@@ -336,7 +336,7 @@
 //                           child: SizedBox(
 //                               height: 40.h,
 //                               child: SvgPicture.asset(
-//                                 'assets/images/bondlogog.svg', // Use the SVG file path
+//                                 'assets/images/ancologog.svg', // Use the SVG file path
 //                                 width: 10.w, // Adjust size as needed
 //                                 height: 35.h,
 //                               )),
@@ -344,7 +344,7 @@
 //                         SizedBox(width: 1.w),
 //                         Text.rich(
 //                           TextSpan(
-//                             text: "BondBridge",
+//                             text: "ancoBridge",
 //                             style: GoogleFonts.leagueSpartan(
 //                               fontSize: 28.sp, // Adjust based on your needs
 //                               fontWeight: FontWeight.w800,
@@ -388,7 +388,7 @@
 //                                   ),
 //                                   child: InkWell(
 //                                     onTap: () {
-//                                       Navigator.push(context, MaterialPageRoute(builder: (context) => const BondChatScreen()));
+//                                       Navigator.push(context, MaterialPageRoute(builder: (context) => const ancoChatScreen()));
 //                                     },
 //                                     child: Row(
 //                                       mainAxisAlignment: MainAxisAlignment.center,
@@ -398,14 +398,14 @@
 //                                           child: Row(
 //                                             children: [
 //                                               SvgPicture.asset(
-//                                                 'assets/icons/bondchat_star.svg',
+//                                                 'assets/icons/ancochat_star.svg',
 //                                                 width: 15.w,
 //                                                 height: 15.h,
 //                                                 color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
 //                                               ),
 //                                               SizedBox(width: 5.w),
 //                                               Text(
-//                                                 'BondChat',
+//                                                 'ancoChat',
 //                                                 style: GoogleFonts.roboto(
 //                                                   fontSize: 16.sp,
 //                                                   fontWeight: FontWeight.bold,
@@ -583,7 +583,7 @@
 // import 'package:socialmedia/api_service/user_provider.dart';
 // import 'package:socialmedia/bottom_nav_bar/activity/acitivity_screen.dart';
 // import 'package:socialmedia/bottom_nav_bar/explore-pages/searchpage.dart';
-// import 'package:socialmedia/users/Bondchat.dart';
+// import 'package:socialmedia/users/ancochat.dart';
 // import 'package:socialmedia/users/profile_screen.dart';
 
 // class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
@@ -622,7 +622,7 @@
 //     // Check if this is a fresh app start and reset label visibility
 //     _checkAndResetLabelOnAppStart();
 
-//     // Original blinking animation for BondChat button
+//     // Original blinking animation for ancoChat button
 //     _blinkController = AnimationController(
 //       duration: const Duration(milliseconds: 850),
 //       vsync: this,
@@ -704,13 +704,13 @@
 //     await prefs.setBool('show_ai_assistant_label', show);
 //   }
 
-//   // Handle BondChat button tap
-//   void _onBondChatTap() {
+//   // Handle ancoChat button tap
+//   void _onancoChatTap() {
 //     setState(() {
 //       _showAIAssistantLabel = false;
 //     });
 //     _saveLabelVisibility(false);
-//     Navigator.push(context, MaterialPageRoute(builder: (context) => const BondChatScreen()));
+//     Navigator.push(context, MaterialPageRoute(builder: (context) => const ancoChatScreen()));
 //   }
 
 //   @override
@@ -752,7 +752,7 @@
 //                           child: SizedBox(
 //                               height: 40.h,
 //                               child: SvgPicture.asset(
-//                                 'assets/images/bondlogog.svg', // Use the SVG file path
+//                                 'assets/images/ancologog.svg', // Use the SVG file path
 //                                 width: 10.w, // Adjust size as needed
 //                                 height: 35.h,
 //                               )),
@@ -760,7 +760,7 @@
 //                         SizedBox(width: 1.w),
 //                         Text.rich(
 //                           TextSpan(
-//                             text: "BondBridge",
+//                             text: "ancoBridge",
 //                             style: GoogleFonts.leagueSpartan(
 //                               fontSize: 28.sp, // Adjust based on your needs
 //                               fontWeight: FontWeight.w800,
@@ -803,7 +803,7 @@
 //                                     borderRadius: BorderRadius.circular(15.sp),
 //                                   ),
 //                                   child: InkWell(
-//                                     onTap: _onBondChatTap, // Use the new method
+//                                     onTap: _onancoChatTap, // Use the new method
 //                                     child: Row(
 //                                       mainAxisAlignment: MainAxisAlignment.center,
 //                                       children: [
@@ -812,14 +812,14 @@
 //                                           child: Row(
 //                                             children: [
 //                                               SvgPicture.asset(
-//                                                 'assets/icons/bondchat_star.svg',
+//                                                 'assets/icons/ancochat_star.svg',
 //                                                 width: 15.w,
 //                                                 height: 15.h,
 //                                                 color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
 //                                               ),
 //                                               SizedBox(width: 5.w),
 //                                               Text(
-//                                                 'BondChat',
+//                                                 'ancoChat',
 //                                                 style: GoogleFonts.roboto(
 //                                                   fontSize: 16.sp,
 //                                                   fontWeight: FontWeight.bold,
@@ -1014,7 +1014,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socialmedia/api_service/user_provider.dart';
 import 'package:socialmedia/bottom_nav_bar/activity/acitivity_screen.dart';
 import 'package:socialmedia/bottom_nav_bar/explore-pages/searchpage.dart';
-import 'package:socialmedia/users/Bondchat.dart';
+import 'package:socialmedia/users/ancochat.dart';
 import 'package:socialmedia/users/profile_screen.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
@@ -1053,7 +1053,7 @@ class _CustomAppBarState extends State<CustomAppBar> with TickerProviderStateMix
     // Check if this is a fresh app start and reset label visibility
     _checkAndResetLabelOnAppStart();
 
-    // Original blinking animation for BondChat button
+    // Original blinking animation for ancoChat button
     _blinkController = AnimationController(
       duration: const Duration(milliseconds: 850),
       vsync: this,
@@ -1135,13 +1135,13 @@ class _CustomAppBarState extends State<CustomAppBar> with TickerProviderStateMix
     await prefs.setBool('show_ai_assistant_label', show);
   }
 
-  // Handle BondChat button tap
-  void _onBondChatTap() {
+  // Handle ancoChat button tap
+  void _onancoChatTap() {
     setState(() {
       _showAIAssistantLabel = false;
     });
     _saveLabelVisibility(false);
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const BondChatScreen()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const ancoChatScreen()));
   }
 
   @override
@@ -1183,7 +1183,7 @@ class _CustomAppBarState extends State<CustomAppBar> with TickerProviderStateMix
     //                       child: SizedBox(
     //                           height: 40.h,
     //                           child: SvgPicture.asset(
-    //                             'assets/images/bondlogog.svg', // Use the SVG file path
+    //                             'assets/images/ancologog.svg', // Use the SVG file path
     //                             width: 10.w, // Adjust size as needed
     //                             height: 35.h,
     //                           )),
@@ -1191,7 +1191,7 @@ class _CustomAppBarState extends State<CustomAppBar> with TickerProviderStateMix
     //                     SizedBox(width: 1.w),
     //                     Text.rich(
     //                       TextSpan(
-    //                         text: "BondBridge",
+    //                         text: "ancoBridge",
     //                         style: GoogleFonts.leagueSpartan(
     //                           fontSize: 28.sp, // Adjust based on your needs
     //                           fontWeight: FontWeight.w800,
@@ -1231,7 +1231,7 @@ class _CustomAppBarState extends State<CustomAppBar> with TickerProviderStateMix
     //                             borderRadius: BorderRadius.circular(15.sp),
     //                           ),
     //                           child: InkWell(
-    //                             onTap: _onBondChatTap, // Use the new method
+    //                             onTap: _onancoChatTap, // Use the new method
     //                             child: Row(
     //                               mainAxisAlignment: MainAxisAlignment.center,
     //                               children: [
@@ -1240,14 +1240,14 @@ class _CustomAppBarState extends State<CustomAppBar> with TickerProviderStateMix
     //                                   child: Row(
     //                                     children: [
     //                                       SvgPicture.asset(
-    //                                         'assets/icons/bondchat_star.svg',
+    //                                         'assets/icons/ancochat_star.svg',
     //                                         width: 15.w,
     //                                         height: 15.h,
     //                                         color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
     //                                       ),
     //                                       SizedBox(width: 5.w),
     //                                       Text(
-    //                                         'BondChat',
+    //                                         'ancoChat',
     //                                         style: GoogleFonts.roboto(
     //                                           fontSize: 16.sp,
     //                                           fontWeight: FontWeight.bold,
@@ -1276,10 +1276,10 @@ class _CustomAppBarState extends State<CustomAppBar> with TickerProviderStateMix
     //                         ),
     //                       ],
     //                     ),
-    //                     // Enhanced hanging label - positioned below BondChat button with zero spacing
+    //                     // Enhanced hanging label - positioned below ancoChat button with zero spacing
     //                     if (_showAIAssistantLabel)
     //                       Padding(
-    //                         padding: EdgeInsets.only(right: 70.w), // Align with BondChat button
+    //                         padding: EdgeInsets.only(right: 70.w), // Align with ancoChat button
     //                         child: SlideTransition(
     //                           position: _slideAnimation,
     //                           child: ScaleTransition(
@@ -1367,7 +1367,7 @@ class _CustomAppBarState extends State<CustomAppBar> with TickerProviderStateMix
                           child: SizedBox(
                               height: 40.h,
                               child: SvgPicture.asset(
-                                'assets/images/bondlogog.svg', // Use the SVG file path
+                                'assets/images/ancologog.svg', // Use the SVG file path
                                 width: 10.w, // Adjust size as needed
                                 height: 35.h,
                               )),
@@ -1375,7 +1375,7 @@ class _CustomAppBarState extends State<CustomAppBar> with TickerProviderStateMix
                         SizedBox(width: 1.w),
                         Text.rich(
                           TextSpan(
-                            text: "BondBridge",
+                            text: "ancoBridge",
                             style: GoogleFonts.leagueSpartan(
                               fontSize: 28.sp, // Adjust based on your needs
                               fontWeight: FontWeight.w800,
@@ -1415,7 +1415,7 @@ class _CustomAppBarState extends State<CustomAppBar> with TickerProviderStateMix
                                 borderRadius: BorderRadius.circular(15.sp),
                               ),
                               child: InkWell(
-                                onTap: _onBondChatTap, // Use the new method
+                                onTap: _onancoChatTap, // Use the new method
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                               import 'package:flutter/material.dart';
@@ -1432,7 +1432,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -1506,7 +1506,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -1580,7 +1580,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -1654,7 +1654,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -1728,7 +1728,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -1802,7 +1802,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -1876,7 +1876,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -1950,7 +1950,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -2024,7 +2024,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -2098,7 +2098,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -2172,7 +2172,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -2246,7 +2246,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -2320,7 +2320,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -2394,7 +2394,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -2468,7 +2468,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -2542,7 +2542,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -2608,14 +2608,14 @@ class CompleteChatShimmer extends StatelessWidget {
                                       child: Row(
                                         children: [
                                           SvgPicture.asset(
-                                            'assets/icons/bondchat_star.svg',
+                                            'assets/icons/ancochat_star.svg',
                                             width: 15.w,
                                             height: 15.h,
                                             color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                                           ),
                                           SizedBox(width: 5.w),
                                           Text(
-                                            'BondChat',
+                                            'ancoChat',
                                             style: GoogleFonts.roboto(
                                               fontSize: 16.sp,
                                               fontWeight: FontWeight.bold,
@@ -2644,12 +2644,12 @@ class CompleteChatShimmer extends StatelessWidget {
                             ),
                           ],
                         ),
-                        // Enhanced hanging label - positioned below BondChat button with zero spacing
+                        // Enhanced hanging label - positioned below ancoChat button with zero spacing
                         if (_showAIAssistantLabel)
                           Transform.translate(
                             offset: Offset(0, -9.h), // Move up by 2 pixels to eliminate gap
                             child: Padding(
-                              padding: EdgeInsets.only(right: 69.w), // Align with BondChat button
+                              padding: EdgeInsets.only(right: 69.w), // Align with ancoChat button
                               child: SlideTransition(
                                 position: _slideAnimation,
                                 child: ScaleTransition(
@@ -2766,7 +2766,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -2840,7 +2840,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -2914,7 +2914,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -2988,7 +2988,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -3062,7 +3062,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -3136,7 +3136,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -3210,7 +3210,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -3284,7 +3284,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -3358,7 +3358,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -3432,7 +3432,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -3506,7 +3506,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -3580,7 +3580,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -3654,7 +3654,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -3728,7 +3728,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -3802,7 +3802,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -3876,7 +3876,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -3950,7 +3950,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -4024,7 +4024,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -4098,7 +4098,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -4172,7 +4172,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -4246,7 +4246,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -4320,7 +4320,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -4394,7 +4394,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -4468,7 +4468,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),
@@ -4542,7 +4542,7 @@ class CompleteChatShimmer extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: SvgPicture.asset(
-            'assets/icons/bondchat_star.svg',
+            'assets/icons/ancochat_star.svg',
             width: 50.w,
             height: 50.h,
           ),

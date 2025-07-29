@@ -221,7 +221,7 @@ class __BuildGroupInfoScreenState extends State<_BuildGroupInfoScreen> {
     }
   }
 
-  void _rewriteBioWithBondChat() async {
+  void _rewriteBioWithancoChat() async {
     if (_infoController.text.isEmpty) return;
 
     // Select all text
@@ -235,9 +235,13 @@ class __BuildGroupInfoScreenState extends State<_BuildGroupInfoScreen> {
     try {
       // Make API Call
       final response = await http.post(
-        Uri.parse("${BASE_URL}api/reWriteWithBond"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"caption": _infoController.text}),
+        Uri.parse("${BASE_URL}api/reWriteWithanco"),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode({
+          "caption": _infoController.text
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -278,9 +282,7 @@ class __BuildGroupInfoScreenState extends State<_BuildGroupInfoScreen> {
                   },
                   child: Icon(
                     Icons.arrow_back_ios,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white60
-                        : Colors.black,
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white60 : Colors.black,
                   ),
                 ),
               ],
@@ -393,13 +395,11 @@ class __BuildGroupInfoScreenState extends State<_BuildGroupInfoScreen> {
                   padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(54.r),
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? const Color(0xFF1E1E1E)
-                        : Colors.grey[100],
+                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.grey[100],
                     border: Border.all(color: const Color(0xFF7400A5)),
                   ),
                   child: GestureDetector(
-                    onTap: _isRewritingBio ? null : _rewriteBioWithBondChat,
+                    onTap: _isRewritingBio ? null : _rewriteBioWithancoChat,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -418,9 +418,7 @@ class __BuildGroupInfoScreenState extends State<_BuildGroupInfoScreen> {
                                 style: GoogleFonts.roboto(
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.w400,
-                                  color: Theme.of(context).brightness == Brightness.dark
-                                      ? AppColors.darkText
-                                      : AppColors.lightText,
+                                  color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText,
                                 ),
                               ),
                         if (!_isRewritingBio) ...[
@@ -437,7 +435,7 @@ class __BuildGroupInfoScreenState extends State<_BuildGroupInfoScreen> {
                               ],
                             ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
                             child: Text(
-                              'BondChat',
+                              'ancoChat',
                               style: GoogleFonts.roboto(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
@@ -447,7 +445,7 @@ class __BuildGroupInfoScreenState extends State<_BuildGroupInfoScreen> {
                           ),
                           SizedBox(width: 5.w),
                           SvgPicture.asset(
-                            'assets/icons/bondchat_star.svg',
+                            'assets/icons/ancochat_star.svg',
                             width: 15.w,
                             height: 15.h,
                           )
@@ -703,9 +701,7 @@ class _BuildInterestsScreenState extends State<BuildInterestsScreen> {
                       },
                       child: Icon(
                         Icons.arrow_back_ios,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white60
-                            : Colors.black,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white60 : Colors.black,
                       ),
                     ),
                   ],

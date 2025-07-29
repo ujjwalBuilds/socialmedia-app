@@ -2,7 +2,7 @@ name: socialmedia
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -31,7 +31,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
@@ -50,18 +49,18 @@ dependencies:
   socket_io_client:
   agora_rtc_engine: ^6.0.0
   permission_handler:
-  photo_view: 
+  photo_view:
   camera:
   pull_to_refresh: ^2.0.0
   loading_animation_widget:
   web_socket_channel:
   infinite_scroll_pagination:
-  glassycontainer: 
-  pinput: 
-  fluttertoast: 
-  flutter_chat_reactions: 
-  tab_container: 
-  carousel_slider: 
+  glassycontainer:
+  pinput:
+  fluttertoast:
+  flutter_chat_reactions:
+  tab_container:
+  carousel_slider:
   flutter_svg: ^2.0.17
   shimmer: ^3.0.0
   in_app_notification: ^1.1.2
@@ -83,7 +82,7 @@ dependencies:
   expandable_text: ^2.3.0
   flutter_image_compress: ^2.1.0
   image: ^4.5.4
-  
+
   flutter_callkit_incoming: ^2.5.2
   flutter_foreground_task: ^8.17.0
   html: ^0.15.5+1
@@ -97,8 +96,6 @@ dependencies:
   media_kit: ^1.2.0
   media_kit_libs_video: ^1.0.6
   rxdart: ^0.27.7
-  
-  
 
 dev_dependencies:
   flutter_test:
@@ -117,7 +114,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -128,7 +124,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/avatar/
-    - assets/images/bondlogog.svg
+    - assets/images/ancologog.svg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -170,4 +166,3 @@ flutter_launcher_icons:
     image_path: "assets/app_logo.png"
     background_color: "#000000"
     theme_color: "#000000"
-

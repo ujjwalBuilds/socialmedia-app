@@ -100,7 +100,7 @@
 
 //   Future<void> _fetchCommunityInfo(String communityId, Map<String, String> headers, List<Community> fetchedCommunities) async {
 //     try {
-//       final Uri communityUrl = Uri.parse('https://bond-bridge-admin-dashboard.vercel.app/api/communities/$communityId');
+//       final Uri communityUrl = Uri.parse('https://anco-bridge-admin-dashboard.vercel.app/api/communities/$communityId');
 //       final communityResponse = await http.get(
 //         communityUrl,
 //         headers: headers,
@@ -153,8 +153,7 @@ class CommunityProvider with ChangeNotifier {
       };
 
       // First fetch the user profile to get community IDs
-      final Uri profileUrl =
-          Uri.parse('${BASE_URL}api/showProfile?other=$userId');
+      final Uri profileUrl = Uri.parse('${BASE_URL}api/showProfile?other=$userId');
       final profileResponse = await http.get(
         profileUrl,
         headers: headers,
@@ -162,12 +161,10 @@ class CommunityProvider with ChangeNotifier {
 
       if (profileResponse.statusCode == 200) {
         final profileData = json.decode(profileResponse.body);
-        final communityIds =
-            List<String>.from(profileData['result'][0]['communities'] ?? []);
+        final communityIds = List<String>.from(profileData['result'][0]['communities'] ?? []);
 
         // Set the community count immediately
         _communityCount = communityIds.length;
-        
 
         if (communityIds.isEmpty) {
           _communities = [];
@@ -201,11 +198,9 @@ class CommunityProvider with ChangeNotifier {
     }
   }
 
-  Future<void> _fetchCommunityInfo(String communityId,
-      Map<String, String> headers, List<Community> fetchedCommunities) async {
+  Future<void> _fetchCommunityInfo(String communityId, Map<String, String> headers, List<Community> fetchedCommunities) async {
     try {
-      final Uri communityUrl =
-          Uri.parse('${BASE_URL_COMMUNITIES}api/communities/$communityId');
+      final Uri communityUrl = Uri.parse('${BASE_URL_COMMUNITIES}api/communities/$communityId');
       final communityResponse = await http.get(
         communityUrl,
         headers: headers,
@@ -218,8 +213,7 @@ class CommunityProvider with ChangeNotifier {
         debugPrint("DEBUG Data: ${communityData.toString()}");
         fetchedCommunities.add(Community.fromJson(communityData));
       } else {
-        print(
-            'Error fetching community $communityId: ${communityResponse.statusCode} - ${communityResponse.body}');
+        print('Error fetching community $communityId: ${communityResponse.statusCode} - ${communityResponse.body}');
       }
     } catch (e) {
       print('Error fetching community $communityId: $e');
