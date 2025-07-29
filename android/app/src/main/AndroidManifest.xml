@@ -4,7 +4,7 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     
     <application
-        android:label="ancoBridge"
+        android:label="ancoway"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
         android:enableOnBackInvokedCallback="true">

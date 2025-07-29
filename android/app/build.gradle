@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "com.ancobridge.ancobridgeonline"
+    namespace = "com.ancoway.ancowayonline"
     compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
@@ -26,7 +26,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.ancobridge.ancobridgeonline"
+        applicationId = "com.ancoway.ancowayonline"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 21

@@ -1,15 +1,15 @@
 {
   "project_info": {
     "project_number": "1038776736651",
-    "project_id": "ancobridge-5bb5b",
-    "storage_bucket": "ancobridge-5bb5b.firebasestorage.app"
+    "project_id": "ancoway-5bb5b",
+    "storage_bucket": "ancoway-5bb5b.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
         "mobilesdk_app_id": "1:1038776736651:android:2a9dfcb7bc5f01addaed8e",
         "android_client_info": {
-          "package_name": "com.ancobridge.ancobridgeonline"
+          "package_name": "com.ancoway.ancowayonline"
         }
       },
       "oauth_client": [],

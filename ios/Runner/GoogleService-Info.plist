@@ -9,11 +9,11 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.ancobridge.com</string>
+	<string>com.ancoway.com</string>
 	<key>PROJECT_ID</key>
-	<string>ancobridge-5bb5b</string>
+	<string>ancoway-5bb5b</string>
 	<key>STORAGE_BUCKET</key>
-	<string>ancobridge-5bb5b.firebasestorage.app</string>
+	<string>ancoway-5bb5b.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>

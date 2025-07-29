@@ -1,4 +1,4 @@
-package com.ancobridge.ancobridgeonline
+package com.ancoway.ancowayonline
 
 import io.flutter.embedding.android.FlutterActivity
 

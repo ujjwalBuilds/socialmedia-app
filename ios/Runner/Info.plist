@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>ancoBridge</string>
+	<string>ancoway</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>ancoBridge</string>
+	<string>ancoway</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -31,7 +31,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs camera access to take photos for posting and profile pictures.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>ancoBridge only uses your location when you are actively using the app to show nearby events and friends. Your location is never accessed in the background.</string>
+	<string>ancoway only uses your location when you are actively using the app to show nearby events and friends. Your location is never accessed in the background.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app needs access to location when in use to show nearby events and friends.</string>
 	<key>NSMicrophoneUsageDescription</key>
