@@ -373,7 +373,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Center(
                   //   child: Text.rich(
                   //     TextSpan(
-                  //       text: "ancoBridge",
+                  //       text: "ancoway",
                   //       style: GoogleFonts.leagueSpartan(
                   //         fontSize: 25.sp, // Adjust based on your needs
                   //         fontWeight: FontWeight.w800,

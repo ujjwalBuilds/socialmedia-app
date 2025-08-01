@@ -89,7 +89,7 @@ Future<Map<String, String>?> _uploadFile({
   required String userid,
   required String token,
 }) async {
-  const uploadUrl = 'https://node-service-preprod.ancobridge.ai/api/fileUpload?entityType=community';
+  const uploadUrl = 'https://node-service-preprod.ancoway.ai/api/fileUpload?entityType=community';
   final request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
 
   request.headers.addAll({

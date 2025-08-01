@@ -100,7 +100,7 @@
 
 //   Future<void> _fetchCommunityInfo(String communityId, Map<String, String> headers, List<Community> fetchedCommunities) async {
 //     try {
-//       final Uri communityUrl = Uri.parse('https://anco-bridge-admin-dashboard.vercel.app/api/communities/$communityId');
+//       final Uri communityUrl = Uri.parse('https://anco-way-admin-dashboard.vercel.app/api/communities/$communityId');
 //       final communityResponse = await http.get(
 //         communityUrl,
 //         headers: headers,

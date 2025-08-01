@@ -75,7 +75,7 @@ class _MembersScreenState extends State<MembersScreen> {
     }
 
     // You can replace this with a constant from your project
-    const String baseUrl = "https://admin.ancobridge.ai/api";
+    const String baseUrl = "https://admin.ancoway.ai/api";
     final uri = Uri.parse('$baseUrl/communities/${widget.communityId}/membersOfCommunity?page=$page&limit=20');
 
     try {

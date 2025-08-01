@@ -7,7 +7,7 @@ import 'package:socialmedia/utils/colors.dart'; // Assuming this file contains A
 class ReferralCodeScreen extends StatelessWidget {
   final String referralCode;
   final int refferCount;
-  final String baseUrl = 'https://www.ancobridge.online/signup?referral='; // Base URL for the referral link
+  final String baseUrl = 'https://www.ancoway.online/signup?referral='; // Base URL for the referral link
 
   const ReferralCodeScreen({
     super.key,

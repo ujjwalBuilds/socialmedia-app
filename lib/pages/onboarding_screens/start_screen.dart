@@ -57,7 +57,7 @@ class _StartScreenState extends State<StartScreen> {
                                   ),
                                 ),
                                 TextSpan(
-                                  text: "ancoBridge, ",
+                                  text: "ancoway, ",
                                   style: GoogleFonts.leagueSpartan(
                                     fontSize: 30.sp,
                                     fontWeight: FontWeight.w700,

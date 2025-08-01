@@ -1071,7 +1071,7 @@ class ThreeDotsMenuRemove extends StatelessWidget {
 
   Future<void> _removeParticipant(BuildContext context) async {
     try {
-      final url = Uri.parse('https://node-service-preprod.ancobridge.ai/api/remove-participant');
+      final url = Uri.parse('https://node-service-preprod.ancoway.ai/api/remove-participant');
       final userProvider = Provider.of<UserProviderall>(context, listen: false);
       final String? token = userProvider.userToken;
       final headers = {

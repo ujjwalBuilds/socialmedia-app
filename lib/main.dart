@@ -252,7 +252,7 @@ Future<void> initCallKit() async {
     'cancelButton': 'Cancel',
     'okButton': 'Ok',
     'foregroundService': {
-      'channelId': 'com.ancobridge.ancobridgeonline',
+      'channelId': 'com.ancoway.ancowayonline',
       'channelName': 'Foreground service for incoming calls',
       'notificationTitle': 'Call service is running',
       'notificationIcon': 'ic_notification',

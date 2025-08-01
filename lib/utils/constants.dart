@@ -1,16 +1,16 @@
 //import 'package:flutter/material.dart';
 
 //const String BASE_URL = 'http://192.168.1.46:3000/';
-// const String BASE_URL = 'https://node-service-dev.ancobridge.ai/';
+// const String BASE_URL = 'https://node-service-dev.ancoway.ai/';
 import 'package:flutter/material.dart';
 
-// const String BASE_URL = 'https://node-service-dev.ancobridge.ai/';
-const String BASE_URL = 'https://node-service-preprod.ancobridge.ai/';
+// const String BASE_URL = 'https://node-service-dev.ancoway.ai/';
+const String BASE_URL = 'https://node-service-preprod.ancoway.ai/';
 
 // const String BASE_URL = 'http://10.0.4.35:3000/';
-// const String BASE_URL_COMMUNITIES = 'https://anco-bridge-admin-dashboard.vercel.app/';
+// const String BASE_URL_COMMUNITIES = 'https://anco-way-admin-dashboard.vercel.app/';
 
-const String BASE_URL_COMMUNITIES = 'https://admin.ancobridge.ai/';
+const String BASE_URL_COMMUNITIES = 'https://admin.ancoway.ai/';
 
 //to call username
 // final username = Provider.of<UserProvider>(context).username;

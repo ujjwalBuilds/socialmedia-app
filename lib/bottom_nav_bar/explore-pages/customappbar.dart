@@ -78,7 +78,7 @@
 //                         SizedBox(width: 1.w),
 //                         Text.rich(
 //                           TextSpan(
-//                             text: "ancoBridge",
+//                             text: "ancoway",
 //                             style: GoogleFonts.leagueSpartan(
 //                               fontSize: 28.sp, // Adjust based on your needs
 //                               fontWeight: FontWeight.w800,
@@ -344,7 +344,7 @@
 //                         SizedBox(width: 1.w),
 //                         Text.rich(
 //                           TextSpan(
-//                             text: "ancoBridge",
+//                             text: "ancoway",
 //                             style: GoogleFonts.leagueSpartan(
 //                               fontSize: 28.sp, // Adjust based on your needs
 //                               fontWeight: FontWeight.w800,
@@ -760,7 +760,7 @@
 //                         SizedBox(width: 1.w),
 //                         Text.rich(
 //                           TextSpan(
-//                             text: "ancoBridge",
+//                             text: "ancoway",
 //                             style: GoogleFonts.leagueSpartan(
 //                               fontSize: 28.sp, // Adjust based on your needs
 //                               fontWeight: FontWeight.w800,
@@ -1191,7 +1191,7 @@ class _CustomAppBarState extends State<CustomAppBar> with TickerProviderStateMix
     //                     SizedBox(width: 1.w),
     //                     Text.rich(
     //                       TextSpan(
-    //                         text: "ancoBridge",
+    //                         text: "ancoway",
     //                         style: GoogleFonts.leagueSpartan(
     //                           fontSize: 28.sp, // Adjust based on your needs
     //                           fontWeight: FontWeight.w800,
@@ -1375,7 +1375,7 @@ class _CustomAppBarState extends State<CustomAppBar> with TickerProviderStateMix
                         SizedBox(width: 1.w),
                         Text.rich(
                           TextSpan(
-                            text: "ancoBridge",
+                            text: "ancoway",
                             style: GoogleFonts.leagueSpartan(
                               fontSize: 28.sp, // Adjust based on your needs
                               fontWeight: FontWeight.w800,

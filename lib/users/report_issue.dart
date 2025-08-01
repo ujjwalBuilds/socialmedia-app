@@ -194,7 +194,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen> {
                 ),
                 SizedBox(height: 10.h),
                 Text(
-                  "Support Email:\n info@ancobridge.ai",
+                  "Support Email:\n info@ancoway.ai",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.roboto(
                     fontSize: 14,

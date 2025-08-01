@@ -52,16 +52,16 @@ class DefaultFirebaseOptions {
     apiKey: 'AIzaSyDdE4XpP7sChIrUZ7mXqXLDjRufBfMEa5k',
     appId: '1:1038776736651:android:2a9dfcb7bc5f01addaed8e',
     messagingSenderId: '1038776736651',
-    projectId: 'ancobridge-5bb5b',
-    storageBucket: 'ancobridge-5bb5b.firebasestorage.app',
+    projectId: 'ancoway-5bb5b',
+    storageBucket: 'ancoway-5bb5b.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAjYZuY0IvrJsH6Js2tSKfD2hSWrhIp3I8',
     appId: '1:1038776736651:ios:04ffaadb268372c6daed8e',
     messagingSenderId: '1038776736651',
-    projectId: 'ancobridge-5bb5b',
-    storageBucket: 'ancobridge-5bb5b.firebasestorage.app',
-    iosBundleId: 'com.ancobridge.com',
+    projectId: 'ancoway-5bb5b',
+    storageBucket: 'ancoway-5bb5b.firebasestorage.app',
+    iosBundleId: 'com.ancoway.com',
   );
 }
